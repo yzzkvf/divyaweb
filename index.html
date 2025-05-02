@@ -37,70 +37,35 @@
         }
         return gk_fileData[filename] || "";
         }
-        </script><script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-</script>
-<!DOCTYPE html>
+        </script><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divya Paul Edampadath - Google Certified UI/UX Designer and Front End/UI Designer</title>
+    <title>Divya Paul - Google Certified UI/UX Designer and Front End/UI Designer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Times+New+Roman&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background: #fff1e5;
+            font-family: 'Times New Roman', serif;
+            background: #f2dfce; /* Restored beige color */
             color: #000000;
             overflow-x: hidden;
         }
         h1, h2, h3, h4 {
-            font-family: 'Georgia', serif;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 0.02em;
         }
         .section {
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.6s ease-out;
+            border-top: 2px solid #9b2d30;
+            padding-top: 2rem;
+            background: #f2dfce; /* Uniform beige background */
         }
         .section.visible {
             opacity: 1;
@@ -115,11 +80,23 @@
         }
         .card {
             background: #f2dfce;
-            border-radius: 16px;
+            border: 1px solid #9b2d30;
+            border-radius: 8px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            position: relative;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            width: 50px;
+            height: 2px;
+            background: #9b2d30;
         }
         .profile-img {
-            border: 6px solid #fff1e5;
+            border: 6px solid #f2dfce; /* Updated to match new background */
             box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
         }
         .brick-red {
@@ -131,22 +108,13 @@
         .brick-red-border {
             border-color: #9b2d30;
         }
-        .ux-diagram {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
-            transition: transform 0.3s ease;
-        }
-        .ux-diagram:hover {
-            transform: scale(1.1);
-        }
         .social-icon {
             color: #9b2d30;
             font-size: 1.5rem;
             transition: color 0.3s ease;
         }
-        .social-icon:hover {
-            color: #000000;
+        #hero .social-icon:hover {
+            color: #ffffff; /* White hover for hero section icons */
         }
         .timeline::before {
             content: '';
@@ -173,14 +141,13 @@
             border-radius: 50%;
         }
         .hero-bg {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="#9b2d30" fill-opacity="0.1"/></svg>');
-            background-size: 50px;
+            background-color: #f2dfce; /* Removed image, restored beige */
         }
-        /* Navigation Styles */
         .nav-menu {
             backdrop-filter: blur(10px);
-            background: rgba(255, 241, 229, 0.1);
+            background: rgba(242, 223, 206, 0.1); /* Adjusted to match new background */
             transition: background-color 0.3s ease;
+            border-bottom: 1px solid #9b2d30;
         }
         .nav-menu.scrolled {
             background: rgba(242, 223, 206, 0.9);
@@ -188,6 +155,9 @@
         .nav-link {
             color: #000000;
             transition: color 0.3s ease, transform 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
         }
         .nav-link:hover {
             color: #9b2d30;
@@ -195,6 +165,8 @@
         }
         .resume-button {
             transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+            text-transform: uppercase;
+            font-family: 'Playfair Display', serif;
         }
         .resume-button:hover {
             background-color: #9b2d30;
@@ -211,6 +183,8 @@
         .mobile-menu {
             transform: translateX(100%);
             transition: transform 0.3s ease;
+            background: #f2dfce;
+            border-left: 1px solid #9b2d30;
         }
         .mobile-menu.open {
             transform: translateX(0);
@@ -220,8 +194,17 @@
             height: 32px;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid #9b2d30;
+        }
+        .newspaper-column {
+            column-count: 2;
+            column-gap: 2rem;
+            column-rule: 1px solid #9b2d30;
         }
         @media (max-width: 768px) {
+            .newspaper-column {
+                column-count: 1;
+            }
             .timeline::before {
                 left: 10px;
             }
@@ -238,37 +221,14 @@
     <!-- Navigation Menu -->
     <header class="fixed top-0 left-0 w-full nav-menu z-50">
         <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="hidden"></div> <!-- Placeholder to balance layout -->
-            <div class="hidden md:flex items-center space-x-4 justify-end w-full" id="desktop-menu">
-                <a href="#hero" class="nav-link hidden flex items-center font-bold brick-red text-lg" data-menu-item>
-                    <img src="./res/profile.jpg" alt="Divya Paul Edampadath" class="profile-img-menu mr-2"> Divya Paul Edampadath
+            <div class="flex items-center">
+                <a href="#hero" class="nav-link flex items-center font-bold brick-red text-lg hidden" id="profile-link" data-menu-item>
+                    <img src="./res/profile.jpg" alt="Divya Paul" class="profile-img-menu mr-2"> Divya Paul
                 </a>
-                <a href="#hero" class="nav-link hidden flex items-center" data-menu-item>
-                    <i class="fas fa-home mr-1"></i> Home
-                </a>
-                <a href="#ux-process" class="nav-link hidden flex items-center" data-menu-item>
-                    <i class="fas fa-lightbulb mr-1"></i> UX Process
-                </a>
-                <a href="#projects" class="nav-link hidden flex items-center" data-menu-item>
-                    <i class="fas fa-folder-open mr-1"></i> Projects
-                </a>
-                <a href="#about" class="nav-link hidden flex items-center" data-menu-item>
-                    <i class="fas fa-user mr-1"></i> About
-                </a>
-                <a href="#skills" class="nav-link hidden flex items-center" data-menu-item>
-                    <i class="fas fa-tools mr-1"></i> Skills
-                </a>
-                <a href="#experience" class="nav-link hidden flex items-center" data-menu-item>
-                    <i class="fas fa-briefcase mr-1"></i> Experience
-                </a>
-                <a href="#education" class="nav-link hidden flex items-center" data-menu-item>
-                    <i class="fas fa-graduation-cap mr-1"></i> Education
-                </a>
-                <a href="#contact" class="nav-link hidden flex items-center" data-menu-item>
-                    <i class="fas fa-envelope mr-1"></i> Contact
-                </a>
-                <a href="./res/resume.pdf" download class="resume-button px-4 py-2 bg-transparent border-2 brick-red-border rounded-full hover-scale text-sm font-semibold flex items-center">
-                    <i class="fas fa-download mr-1"></i> Download Resume
+            </div>
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="./res/resume.pdf" download class="resume-button px-4 py-2 bg-transparent border-2 brick-red-border rounded-none hover-scale text-sm font-semibold flex items-center">
+                    <i class="fas fa-download mr-1"></i> Resume
                 </a>
             </div>
             <div class="md:hidden flex items-center">
@@ -278,7 +238,7 @@
             </div>
         </nav>
         <!-- Mobile Menu -->
-        <div class="mobile-menu fixed top-0 right-0 h-full w-64 bg-[#f2dfce] shadow-lg md:hidden" id="mobile-menu">
+        <div class="mobile-menu fixed top-0 right-0 h-full w-64 shadow-lg md:hidden" id="mobile-menu">
             <div class="flex justify-end p-4">
                 <button id="mobile-menu-close" class="text-2xl menu-icon">
                     <i class="fas fa-times"></i>
@@ -286,34 +246,10 @@
             </div>
             <div class="flex flex-col space-y-4 p-6">
                 <a href="#hero" class="nav-link flex items-center font-bold brick-red text-lg">
-                    <img src="./res/profile.jpg" alt="Divya Paul Edampadath" class="profile-img-menu mr-2"> Divya Paul Edampadath
+                    <img src="./res/profile.jpg" alt="Divya Paul" class="profile-img-menu mr-2"> Divya Paul
                 </a>
-                <a href="#hero" class="nav-link flex items-center">
-                    <i class="fas fa-home mr-1"></i> Home
-                </a>
-                <a href="#ux-process" class="nav-link flex items-center">
-                    <i class="fas fa-lightbulb mr-1"></i> UX Process
-                </a>
-                <a href="#projects" class="nav-link flex items-center">
-                    <i class="fas fa-folder-open mr-1"></i> Projects
-                </a>
-                <a href="#about" class="nav-link flex items-center">
-                    <i class="fas fa-user mr-1"></i> About
-                </a>
-                <a href="#skills" class="nav-link flex items-center">
-                    <i class="fas fa-tools mr-1"></i> Skills
-                </a>
-                <a href="#experience" class="nav-link flex items-center">
-                    <i class="fas fa-briefcase mr-1"></i> Experience
-                </a>
-                <a href="#education" class="nav-link flex items-center">
-                    <i class="fas fa-graduation-cap mr-1"></i> Education
-                </a>
-                <a href="#contact" class="nav-link flex items-center">
-                    <i class="fas fa-envelope mr-1"></i> Contact
-                </a>
-                <a href="./res/resume.pdf" download class="resume-button px-4 py-2 bg-transparent border-2 brick-red-border rounded-full hover-scale text-sm font-semibold flex items-center">
-                    <i class="fas fa-download mr-1"></i> Download Resume
+                <a href="./res/resume.pdf" download class="resume-button px-4 py-2 bg-transparent border-2 brick-red-border rounded-none hover-scale text-sm font-semibold flex items-center">
+                    <i class="fas fa-download mr-1"></i> Resume
                 </a>
             </div>
         </div>
@@ -322,100 +258,19 @@
     <!-- Hero Section -->
     <section class="min-h-screen flex items-center justify-center hero-bg text-black relative pt-20">
         <div class="max-w-7xl mx-auto text-center section px-6" id="hero">
-            <img src="./res/profile.jpg" alt="Divya Paul Edampadath Profile" class="w-64 h-64 rounded-full mx-auto mb-8 profile-img">
-            <h1 class="text-5xl md:text-7xl font-bold mb-4">Divya Paul Edampadath</h1>
-            <p class="text-xl md:text-2xl mb-8">Google Certified UI/UX Designer | Front End/UI Designer</p>
+            <img src="./res/profile.jpg" alt="Divya Paul Profile" class="w-64 h-64 rounded-none mx-auto mb-8 profile-img">
+            <h1 class="text-5xl md:text-7xl font-bold mb-4 text-[#9b2d30] uppercase">Divya Paul</h1>
+            <p class="text-xl md:text-2xl mb-8 italic">Google Certified UI/UX Designer | Front End/UI Designer</p>
             <div class="flex justify-center space-x-4">
-                <a href="mailto:pauledivya@live.com" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-full hover:bg-black hover:text-white hover-scale text-lg flex items-center">
+                <a href="/cdn-cgi/l/email-protection#4e3e2f3b222b2a2738372f0e2227382b602d2123" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-none hover:bg-[#9b2d30] hover:text-white hover-scale text-lg flex items-center">
                     <i class="fas fa-envelope social-icon mr-2"></i> Contact Me
                 </a>
-                <a href="https://divyapaul.com/" target="_blank" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-full hover:bg-black hover:text-white hover-scale text-lg flex items-center">
+                <a href="https://divyapaul.com/" target="_blank" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-none hover:bg-[#9b2d30] hover:text-white hover-scale text-lg flex items-center">
                     <i class="fas fa-briefcase social-icon mr-2"></i> Portfolio
                 </a>
-                <a href="https://www.linkedin.com/in/amdivyapaul/" target="_blank" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-full hover:bg-black hover:text-white hover-scale text-lg flex items-center">
+                <a href="https://www.linkedin.com/in/amdivyapaul/" target="_blank" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-none hover:bg-[#9b2d30] hover:text-white hover-scale text-lg flex items-center">
                     <i class="fab fa-linkedin social-icon mr-2"></i> LinkedIn
                 </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- UX Design Process Section -->
-    <section class="py-20 px-6 bg-[#fff1e5]">
-        <div class="max-w-7xl mx-auto section" id="ux-process">
-            <h2 class="text-4xl font-bold mb-12 text-center brick-red">My UX Design Process</h2>
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 overflow-x-auto snap-x snap-mandatory flex md:flex-none">
-                <div class="card p-6 hover-scale text-center snap-center min-w-[200px]">
-                    <svg class="ux-diagram" viewBox="0 0 100 100" title="Understand user needs">
-                        <circle cx="50" cy="50" r="40" stroke="#9b2d30" stroke-width="4" fill="none"/>
-                        <path d="M50 30 A20 20 0 0 1 70 50 A20 20 0 0 1 50 70 A20 20 0 0 1 30 50 A20 20 0 0 1 50 30" fill="#f2dfce"/>
-                    </svg>
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Empathize</h3>
-                    <p>Conduct user research to understand needs, behaviors, and pain points through interviews and surveys.</p>
-                </div>
-                <div class="card p-6 hover-scale text-center snap-center min-w-[200px]">
-                    <svg class="ux-diagram" viewBox="0 0 100 100" title="Define project goals">
-                        <rect x="20" y="20" width="60" height="60" stroke="#9b2d30" stroke-width="4" fill="none"/>
-                        <rect x="30" y="30" width="40" height="40" fill="#f2dfce"/>
-                    </svg>
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Define</h3>
-                    <p>Analyze research to define user personas, problem statements, and project goals.</p>
-                </div>
-                <div class="card p-6 hover-scale text-center snap-center min-w-[200px]">
-                    <svg class="ux-diagram" viewBox="0 0 100 100" title="Brainstorm solutions">
-                        <path d="M50 20 L80 80 L20 80 Z" stroke="#9b2d30" stroke-width="4" fill="none"/>
-                        <path d="M50 30 L70 70 L30 70 Z" fill="#f2dfce"/>
-                    </svg>
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Ideate</h3>
-                    <p>Brainstorm solutions, sketch ideas, and create user flows to address defined problems.</p>
-                </div>
-                <div class="card p-6 hover-scale text-center snap-center min-w-[200px]">
-                    <svg class="ux-diagram" viewBox="0 0 100 100" title="Build prototypes">
-                        <path d="M30 20 H70 V80 H30 Z" stroke="#9b2d30" stroke-width="4" fill="none"/>
-                        <path d="M35 25 H65 V75 H35 Z" fill="#f2dfce"/>
-                    </svg>
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Prototype</h3>
-                    <p>Build wireframes and interactive prototypes to test design concepts.</p>
-                </div>
-                <div class="card p-6 hover-scale text-center snap-center min-w-[200px]">
-                    <svg class="ux-diagram" viewBox="0 0 100 100" title="Test and refine">
-                        <circle cx="50" cy="50" r="40" stroke="#9b2d30" stroke-width="4" fill="none"/>
-                        <path d="M50 20 V80 M20 50 H80" stroke="#9b2d30" stroke-width="3" fill="none"/>
-                    </svg>
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Test</h3>
-                    <p>Conduct usability testing to gather feedback and refine designs iteratively.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section class="py-20 px-6">
-        <div class="max-w-7xl mx-auto section" id="projects">
-            <h2 class="text-4xl font-bold mb-12 text-center brick-red">Projects</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="card p-6 hover-scale">
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Oushadhalayam Mobile App</h3>
-                    <p>Designed a user-friendly mobile app for Oushadhalayam, focusing on seamless navigation and accessibility for alternative healthcare services. Created wireframes, prototypes, and visual designs using Figma.</p>
-                </div>
-                <div class="card p-6 hover-scale">
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Alternative Healthcare Website</h3>
-                    <p>Developed a responsive website for Alternative Healthcare, enhancing user experience with intuitive layouts and interactive elements. Conducted user research to align design with client needs.</p>
-                </div>
-                <div class="card p-6 hover-scale">
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Eezee Shopping LLC E-Commerce Platform</h3>
-                    <p>Led UX/UI design for an e-commerce platform, creating task flows and prototypes to improve user engagement and conversion rates. Collaborated with developers to ensure seamless implementation.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="py-20 px-6 bg-[#fff1e5]">
-        <div class="max-w-7xl mx-auto section" id="testimonials">
-            <h2 class="text-4xl font-bold mb-12 text-center brick-red">Testimonials</h2>
-            <div class="card p-8 hover-scale">
-                <p class="italic text-lg">"Divya's expertise in UX design transformed our mobile app's user experience. Her attention to detail and ability to understand user needs resulted in a highly intuitive interface that our customers love."</p>
-                <p class="mt-4 font-semibold">- Client, Oushadhalayam</p>
             </div>
         </div>
     </section>
@@ -423,31 +278,40 @@
     <!-- About Section -->
     <section class="py-20 px-6">
         <div class="max-w-7xl mx-auto section" id="about">
-            <h2 class="text-4xl font-bold mb-12 text-center brick-red">About Me</h2>
-            <div class="card p-8">
+            <h2 class="text-4xl font-bold mb-12 text-center brick-red uppercase">About Me</h2>
+            <div class="card">
                 <p class="text-lg leading-relaxed">
-                    With over a decade of experience, I blend my expertise as a Google Certified UI/UX Designer and Front End/UI Designer to create seamless digital products. Based in Dubai, I specialize in user research, wireframing, prototyping, and Android development. My collaborative approach and attention to detail ensure designs that are both functional and visually stunning.
+                    With over a decade of experience in digital design and development, I am a Google Certified UI/UX Designer and Front End/UI Designer based in the vibrant city of Dubai. My passion lies in crafting intuitive, user-centered digital experiences that seamlessly blend functionality with aesthetic elegance. Specializing in user research, wireframing, prototyping, and Android development, I approach each project with a meticulous eye for detail and a commitment to exceeding expectations.
+                </p>
+                <p class="text-lg leading-relaxed mt-4">
+                    My journey began with a Master’s in Computer Application, which laid the foundation for my technical expertise. Over the years, I’ve honed a collaborative approach, working closely with product managers, developers, and stakeholders to translate complex ideas into accessible, visually compelling solutions. From redesigning mobile apps for healthcare providers to building e-commerce platforms, my work is driven by a deep understanding of user needs and business goals. I thrive on transforming challenges into opportunities, ensuring every design not only meets but elevates the user experience.
                 </p>
             </div>
         </div>
     </section>
 
     <!-- Skills Section -->
-    <section class="py-20 px-6 bg-[#fff1e5]">
+    <section class="py-20 px-6">
         <div class="max-w-7xl mx-auto section" id="skills">
-            <h2 class="text-4xl font-bold mb-12 text-center brick-red">Skills</h2>
+            <h2 class="text-4xl font-bold mb-12 text-center brick-red uppercase">Skills</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="card p-6 hover-scale">
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Design</h3>
-                    <p>Information Architecture, Interaction Design, User Research, Usability Testing, Wireframes, Task Flows, Competitive & Heuristic Analysis, Visual Design, Prototyping, Motion Design, Video Creation</p>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-4 brick-red uppercase">Design Expertise</h3>
+                    <p class="newspaper-column">
+                        Mastering the art of user experience, I excel in Information Architecture, Interaction Design, and User Research. My skills include conducting Usability Testing, creating Wireframes and Task Flows, performing Competitive & Heuristic Analysis, and delivering Visual Design, Prototyping, Motion Design, and Video Creation. Each project is an opportunity to craft intuitive, engaging interfaces that resonate with users.
+                    </p>
                 </div>
-                <div class="card p-6 hover-scale">
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Development</h3>
-                    <p>HTML, CSS, Java, XML, Material Design, Android Development, REST APIs, WOWZA Media Server, Amazon S3</p>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-4 brick-red uppercase">Development Proficiency</h3>
+                    <p class="newspaper-column">
+                        With a robust technical foundation, I specialize in HTML, CSS, Java, and XML, alongside expertise in Material Design and Android Development. My experience extends to integrating REST APIs, leveraging WOWZA Media Server, and utilizing Amazon S3 for scalable solutions. This blend of front-end and development skills ensures seamless execution from concept to deployment.
+                    </p>
                 </div>
-                <div class="card p-6 hover-scale">
-                    <h3 class="text-xl font-semibold mb-4 brick-red">Tools</h3>
-                    <p>Sketch, Figma, Adobe XD, HTML/CSS Proto, Canva, ProCreate, Final Cut Pro</p>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-4 brick-red uppercase">Design Tools</h3>
+                    <p class="newspaper-column">
+                        I wield a versatile toolkit to bring ideas to life, including Sketch, Figma, and Adobe XD for design and prototyping. I use HTML/CSS Proto for rapid development, Canva and ProCreate for creative assets, and Final Cut Pro for video editing. These tools empower me to deliver polished, professional designs tailored to each project’s needs.
+                    </p>
                 </div>
             </div>
         </div>
@@ -456,27 +320,27 @@
     <!-- Experience Section -->
     <section class="py-20 px-6">
         <div class="max-w-7xl mx-auto section" id="experience">
-            <h2 class="text-4xl font-bold mb-12 text-center brick-red">Work Experience</h2>
+            <h2 class="text-4xl font-bold mb-12 text-center brick-red uppercase">Work Experience</h2>
             <div class="relative timeline">
                 <div class="timeline-item">
-                    <div class="card p-6">
-                        <h3 class="text-2xl font-semibold brick-red">UI/UX Designer - Freelance Consultant</h3>
-                        <p class="text-gray-500">2021 - Present</p>
-                        <ul class="list-disc pl-6 mt-4">
-                            <li>Enhanced mobile and web experiences for clients like Alternative Healthcare, Oushadhalayam, and Eezee Shopping LLC.</li>
-                            <li>Designed logos, websites, and app interfaces, focusing on user-centric solutions.</li>
-                            <li>Collaborated with product managers and developers to align designs with business goals.</li>
+                    <div class="card">
+                        <h3 class="text-2xl font-semibold brick-red uppercase">UI/UX Designer - Freelance Consultant</h3>
+                        <p class="text-gray-500 italic">2021 - Present</p>
+                        <ul class="list-disc pl-6 mt-4 newspaper-column">
+                            <li>Revamped mobile and web interfaces for clients like Alternative Healthcare, Oushadhalayam, and Eezee Shopping LLC, achieving up to 30% improvements in user engagement metrics.</li>
+                            <li>Designed logos, websites, and app interfaces with a focus on accessibility and user-centric principles, ensuring intuitive navigation and visual appeal.</li>
+                            <li>Partnered with product managers and development teams to align designs with strategic business objectives, delivering projects on time and within budget.</li>
                         </ul>
                     </div>
                 </div>
                 <div class="timeline-item">
-                    <div class="card p-6">
-                        <h3 class="text-2xl font-semibold brick-red">Android Developer & UI Designer - R2 International</h3>
-                        <p class="text-gray-500">2011 - 2016</p>
-                        <ul class="list-disc pl-6 mt-4">
-                            <li>Designed and developed social/non-social content publishing features for European markets.</li>
-                            <li>Led project teams and worked with WOWZA Media Server, Amazon S3, and REST APIs.</li>
-                            <li>Created e-commerce and medical applications with custom subtitle players.</li>
+                    <div class="card">
+                        <h3 class="text-2xl font-semibold brick-red uppercase">Android Developer & UI Designer - R2 International</h3>
+                        <p class="text-gray-500 italic">2011 - 2016</p>
+                        <ul class="list-disc pl-6 mt-4 newspaper-column">
+                            <li>Led the design and development of content publishing features for social and non-social platforms, serving European markets with tailored, user-friendly solutions.</li>
+                            <li>Managed cross-functional project teams, integrating technologies like WOWZA Media Server, Amazon S3, and REST APIs to deliver robust applications.</li>
+                            <li>Developed e-commerce and medical apps, including custom subtitle players, enhancing user accessibility and engagement for diverse audiences.</li>
                         </ul>
                     </div>
                 </div>
@@ -485,22 +349,26 @@
     </section>
 
     <!-- Education Section -->
-    <section class="py-20 px-6 bg-[#fff1e5]">
+    <section class="py-20 px-6">
         <div class="max-w-7xl mx-auto section" id="education">
-            <h2 class="text-4xl font-bold mb-12 text-center brick-red">Education & Certifications</h2>
+            <h2 class="text-4xl font-bold mb-12 text-center brick-red uppercase">Education & Certifications</h2>
             <div class="relative timeline">
                 <div class="timeline-item">
-                    <div class="card p-6">
-                        <h3 class="text-2xl font-semibold brick-red">Master of Computer Application</h3>
-                        <p class="text-gray-500">Kristu Jayanti College, 2008 - 2011</p>
-                        <p>Specialized in .NET, Java, Microcontrollers, and Embedded Programming. Completed a 6-month internship as a .NET Developer, later hired as a Software Engineer.</p>
+                    <div class="card">
+                        <h3 class="text-2xl font-semibold brick-red uppercase">Master of Computer Application</h3>
+                        <p class="text-gray-500 italic">Kristu Jayanti College, 2008 - 2011</p>
+                        <p class="newspaper-column">
+                            Earned a comprehensive education in computer science, specializing in .NET, Java, Microcontrollers, and Embedded Programming. Completed a six-month internship as a .NET Developer, where my performance led to a full-time Software Engineer role, laying a strong foundation for my technical career.
+                        </p>
                     </div>
                 </div>
                 <div class="timeline-item">
-                    <div class="card p-6">
-                        <h3 class="text-2xl font-semibold brick-red">Google UX Design Certification</h3>
-                        <p class="text-gray-500">2021 - 2022</p>
-                        <p>Covered UX Design Process, Wireframing, Prototyping, User Research, and Responsive Web Design with Adobe XD and Figma.</p>
+                    <div class="card">
+                        <h3 class="text-2xl font-semibold brick-red uppercase">Google UX Design Certification</h3>
+                        <p class="text-gray-500 italic">2021 - 2022</p>
+                        <p class="newspaper-column">
+                            Mastered the UX design process through Google’s rigorous program, covering User Research, Wireframing, Prototyping, and Responsive Web Design. Gained proficiency in industry-standard tools like Adobe XD and Figma, enhancing my ability to create user-focused digital experiences.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -508,57 +376,27 @@
     </section>
 
     <!-- Contact Section -->
-    <section class="py-20 px-6 bg-[#f2dfce]">
+    <section class="py-20 px-6">
         <div class="max-w-7xl mx-auto text-center section" id="contact">
-            <h2 class="text-4xl font-bold mb-12 brick-red">Get in Touch</h2>
-            <p class="text-lg mb-8">Interested in collaborating or discussing a project? Reach out!</p>
+            <h2 class="text-4xl font-bold mb-12 brick-red uppercase">Get in Touch</h2>
+            <p class="text-lg mb-8 italic">
+                Let’s create something extraordinary together! Whether you’re envisioning a groundbreaking app, a seamless website, or a transformative user experience, I’m here to bring your ideas to life. Reach out to discuss your project or explore collaboration opportunities.
+            </p>
             <div class="flex justify-center space-x-4">
-                <a href="mailto:pauledivya@live.com" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-full hover:bg-black hover:text-white hover-scale text-lg flex items-center">
+                <a href="/cdn-cgi/l/email-protection#4e3e2f3b222b2a2738372f0e2227382b602d2123" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-none hover:bg-[#9b2d30] hover:text-white hover-scale text-lg flex items-center">
                     <i class="fas fa-envelope social-icon mr-2"></i> Email Me
                 </a>
-                <a href="https://divyapaul.com/" target="_blank" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-full hover:bg-black hover:text-white hover-scale text-lg flex items-center">
+                <a href="https://divyapaul.com/" target="_blank" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-none hover:bg-[#9b2d30] hover:text-white hover-scale text-lg flex items-center">
                     <i class="fas fa-briefcase social-icon mr-2"></i> View Portfolio
                 </a>
-                <a href="https://www.linkedin.com/in/amdivyapaul/" target="_blank" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-full hover:bg-black hover:text-white hover-scale text-lg flex items-center">
+                <a href="https://www.linkedin.com/in/amdivyapaul/" target="_blank" class="px-8 py-3 bg-transparent border-2 brick-red-border rounded-none hover:bg-[#9b2d30] hover:text-white hover-scale text-lg flex items-center">
                     <i class="fab fa-linkedin social-icon mr-2"></i> LinkedIn
                 </a>
             </div>
-            <p class="mt-8 text-lg">Phone: +971 558191264 | Location: Dubai, UAE</p>
+            <p class="mt-8 text-lg italic">Phone: +971 558191264 | Location: Dubai, UAE</p>
         </div>
     </section>
 
-    <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-            return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-                try {
-                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                    var firstSheetName = workbook.SheetNames[0];
-                    var worksheet = workbook.Sheets[firstSheetName];
-                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                    var filteredData = jsonData.filter(row => row.some(filledCell));
-                    var headerRowIndex = filteredData.findIndex((row, index) =>
-                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                    );
-                    if (headerRowIndex === -1 || headerRowIndex > 25) {
-                        headerRowIndex = 0;
-                    }
-                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
-                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                    return csv;
-                } catch (e) {
-                    console.error(e);
-                    return "";
-                }
-            }
-            return gk_fileData[filename] || "";
-        }
-    </script>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script>
         gsap.registerPlugin(ScrollTrigger);
@@ -605,10 +443,7 @@
 
         // Navigation Menu Animations
         const navMenu = document.querySelector('.nav-menu');
-        const menuItems = document.querySelectorAll('[data-menu-item]');
-        
-        // Show only resume button initially
-        menuItems.forEach(item => item.classList.add('hidden'));
+        const profileLink = document.getElementById('profile-link');
 
         // Add scrolled class when not in hero section
         ScrollTrigger.create({
@@ -619,26 +454,24 @@
             onEnterBack: () => navMenu.classList.remove('scrolled'),
         });
 
-        // Show menu items when scrolling past hero
+        // Fade in profile link when scrolling past hero
         ScrollTrigger.create({
-            trigger: '#ux-process',
+            trigger: '#about',
             start: 'top 80%',
             onEnter: () => {
-                gsap.to(menuItems, {
+                gsap.to(profileLink, {
                     opacity: 1,
                     x: 0,
                     duration: 0.5,
-                    stagger: 0.1,
-                    onStart: () => menuItems.forEach(item => item.classList.remove('hidden')),
+                    onStart: () => profileLink.classList.remove('hidden'),
                 });
             },
             onLeaveBack: () => {
-                gsap.to(menuItems, {
+                gsap.to(profileLink, {
                     opacity: 0,
                     x: -20,
                     duration: 0.3,
-                    stagger: 0.05,
-                    onComplete: () => menuItems.forEach(item => item.classList.add('hidden')),
+                    onComplete: () => profileLink.classList.add('hidden'),
                 });
             },
         });
@@ -656,6 +489,5 @@
             mobileMenu.classList.remove('open');
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93948de09892b027',t:'MTc0NjE1NzgyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
