@@ -50,7 +50,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&family=Wendy+One&display=swap"
         rel="stylesheet">
     <style>
         body {
@@ -70,14 +70,8 @@
         .section {
             opacity: 0;
             transform: translateY(50px);
-            transition: all 0.8s ease-out;
             padding: 2rem;
             border-radius: 16px;
-        }
-
-        .section.visible {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         .hover-scale {
@@ -172,30 +166,8 @@
         }
 
         .hero-bg {
-            background: none;
             position: relative;
             overflow: hidden;
-        }
-
-        .hero-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 0;
-        }
-
-        .hero-bg::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(155, 45, 48, 0.2), rgba(255, 241, 229, 0.3));
-            z-index: 1;
         }
 
         .hero-content {
@@ -332,6 +304,34 @@
             color: #FFFFFF;
         }
 
+        #typing-animation-container {
+            font-family: 'Wendy One', cursive;
+            min-height: 1.2em;
+            /* Adjusted for very large font, try to keep single line */
+            line-height: 1;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 0.9em;
+            background-color: #FFFFFF;
+            margin-left: 5px;
+            animation: blink 0.7s infinite;
+            vertical-align: baseline;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
 
         @media (max-width: 768px) {
             .timeline::before {
@@ -349,14 +349,17 @@
             .section {
                 padding: 1.5rem;
             }
+
+            #typing-animation-container {
+                min-height: 1.2em;
+                /* Ensure this accommodates text-6xl */
+                line-height: 1;
+            }
         }
     </style>
 </head>
 
 <body>
-    <script type="text/javascript">
-        // GK script
-    </script>
     <header class="fixed top-0 left-0 w-full nav-menu z-50">
         <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center">
@@ -395,17 +398,14 @@
         </div>
     </header>
 
-    <section class="min-h-screen flex items-center justify-center hero-bg text-white relative pt-20" id="hero">
-        <video autoplay loop muted playsinline class="hero-video">
-            <source src="./res/home_background.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <div class="max-w-7xl mx-auto text-center hero-content px-6">
+    <section class="min-h-screen flex items-center justify-center hero-bg text-white relative pt-20 bg-black" id="hero">
+        <div class="max-w-7xl mx-auto text-center hero-content px-6 flex flex-col items-center">
             <img src="./res/profile.jpg" alt="Divya Paul Profile"
                 class="w-64 h-64 rounded-full mx-auto mb-8 profile-img" data-parallax>
             <h1 class="text-5xl md:text-7xl font-bold mb-4">Divya Paul</h1>
             <p class="text-xl md:text-2xl mb-8">Google Certified UI/UX Designer | Front End/UI Designer</p>
-            <div class="flex flex-col sm:flex-row justify-center items-center sm:space-x-4 space-y-4 sm:space-y-0">
+            <div
+                class="flex flex-col sm:flex-row justify-center items-center sm:space-x-4 space-y-4 sm:space-y-0 mb-8 md:mb-12">
                 <a href="mailto:pauledivya@live.com"
                     class="px-8 py-3 bg-white text-black rounded-full hover:bg-gray-200 hover:text-black transition-colors duration-300 text-lg flex items-center justify-center hover-scale font-medium">
                     <i class="fas fa-envelope social-icon mr-2"></i> Contact Me
@@ -418,6 +418,11 @@
                     class="px-8 py-3 bg-transparent border-2 border-white text-white rounded-full hover:bg-white hover:text-black transition-colors duration-300 text-lg flex items-center justify-center hover-scale">
                     <i class="fab fa-linkedin social-icon mr-2"></i> LinkedIn
                 </a>
+            </div>
+            <div id="typing-animation-container"
+                class="text-6xl md:text-8xl font-bold text-center mt-8 md:mt-12 min-h-[1.2em]">
+                <span id="animated-c-area" class="text-white"></span><span id="typed-rest-area"
+                    class="text-white"></span><span class="cursor"></span>
             </div>
         </div>
     </section>
@@ -507,7 +512,7 @@
                             <li>Implemented secure coding practices and optimized app performance, reducing load times
                                 by 30% and increasing user retention by 20% through integration with WOWZA Media Server
                                 and Amazon S3.</li>
-                            <li>Mentored junior developers, introducing test-driven development that improved code
+                            <li>Mentored junior designers, introducing test-driven development that improved code
                                 coverage by 25% and reduced post-release bugs by 15%.</li>
                         </ul>
                     </div>
@@ -697,19 +702,17 @@
         const navMenu = document.querySelector('.nav-menu');
         const profileLink = document.getElementById('profile-link');
 
-        // Controls navMenu background color and Resume button styling
         ScrollTrigger.create({
             trigger: "#hero",
             start: "top top",
-            end: "max", // Track continuously
+            end: "max",
             onUpdate: self => {
                 const heroTop = self.trigger.getBoundingClientRect().top;
-                // Add 'scrolled' if hero top is more than (e.g.) 10px above viewport top
                 if (heroTop < -10) {
                     if (!navMenu.classList.contains('scrolled')) {
                         navMenu.classList.add('scrolled');
                     }
-                } else { // Else (hero is at/near top), remove 'scrolled'
+                } else {
                     if (navMenu.classList.contains('scrolled')) {
                         navMenu.classList.remove('scrolled');
                     }
@@ -717,15 +720,14 @@
             }
         });
 
-        // Controls #profile-link visibility in the navbar
         ScrollTrigger.create({
             trigger: "#hero",
-            start: "top top-=-1", // When the top of the hero is just 1px above the viewport top
-            end: "bottom top",   // When the bottom of the hero section leaves the top of the viewport
+            start: "top top-=-1",
+            end: "bottom top",
             onToggle: self => {
-                if (self.isActive) { // Hero section is active at the top of the viewport
+                if (self.isActive) {
                     gsap.to(profileLink, { opacity: 0, x: -30, duration: 0.3, ease: "power2.inOut", onComplete: () => profileLink.classList.add('hidden') });
-                } else { // Hero section is scrolled past
+                } else {
                     gsap.to(profileLink, { opacity: 1, x: 0, duration: 0.3, ease: "power2.inOut", onStart: () => profileLink.classList.remove('hidden') });
                 }
             }
@@ -744,27 +746,23 @@
 
             let useWhiteTheme = false;
             if (!navMenu.classList.contains('scrolled')) {
-                useWhiteTheme = true; // On Hero (dark background)
+                useWhiteTheme = true;
             } else {
-                // Scrolled past hero. Find the current section at the top of the viewport.
                 let prominentSection = null;
-                const navMenuHeight = navMenu.offsetHeight || 70; // Fallback height
+                const navMenuHeight = navMenu.offsetHeight || 70;
 
                 for (const section of contentSectionsForTheme) {
                     if (section.id === 'hero') continue;
                     const rect = section.getBoundingClientRect();
-                    // Check if the section is currently visible under/near the nav bar
                     if (rect.top <= navMenuHeight && rect.bottom >= navMenuHeight) {
                         prominentSection = section;
                         break;
                     }
                 }
-                // If no section is directly under nav (e.g. in between sections), check first one visible from top
                 if (!prominentSection) {
                     for (const section of contentSectionsForTheme) {
                         if (section.id === 'hero') continue;
                         const rect = section.getBoundingClientRect();
-                        // If section top is within viewport and above fold, consider it prominent
                         if (rect.top >= 0 && rect.top < window.innerHeight * 0.6) {
                             prominentSection = section;
                             break;
@@ -816,6 +814,102 @@
                     mobileMenuThemeObserver.disconnect();
                 },
             });
+        });
+
+        // Typing Animation Logic
+        const animatedCSpan = document.getElementById("animated-c-area");
+        const typedRestSpan = document.getElementById("typed-rest-area");
+
+        const phrases = [
+            { cPart: "C", rest: "reate ", secondWord: "Ideas", color: "#FFFAA0" },
+            { cPart: "C", rest: "raft ", secondWord: "Experiences", color: "#FFB347" },
+            { cPart: "C", rest: "onnecting ", secondWord: "People", color: "#FFB6C1" }
+        ];
+        const typingSpeed = 120;
+        const erasingSpeed = 70;
+        const newSentenceDelay = 1500;
+        const sentenceEndDelay = 2000;
+
+        let sentenceIndex = 0;
+        let charIndex = 0; // For the 'rest' + 'secondWord' part
+        let isDeleting = false;
+        let initialCDone = false; // True after 'C' of the first phrase is typed and its cycle finishes
+
+        async function animateHeroText() {
+            if (!animatedCSpan || !typedRestSpan) return;
+
+            const currentPhraseData = phrases[sentenceIndex];
+            const restOfPhrase = currentPhraseData.rest;
+            const secondWord = currentPhraseData.secondWord;
+            const fullRestAndSecond = restOfPhrase + secondWord;
+            const color = currentPhraseData.color;
+
+            // Handle the initial 'C'
+            if (!initialCDone && sentenceIndex === 0 && !isDeleting && charIndex === 0 && animatedCSpan.textContent === "") {
+                // Type 'C' only for the very first time
+                animatedCSpan.textContent = "C";
+                // Short pause, then proceed with the rest of the first phrase
+                setTimeout(() => {
+                    charIndex = 0; // Reset for the rest part
+                    animateHeroText(); // Call again to start typing the rest
+                }, 300);
+                return;
+            } else if (initialCDone || sentenceIndex > 0) {
+                // For subsequent phrases or loops, 'C' is static
+                animatedCSpan.textContent = "C";
+            }
+
+
+            if (isDeleting) {
+                // Erasing logic for typedRestSpan
+                if (charIndex > 0) {
+                    let currentVisibleRest = "";
+                    if (charIndex - 1 >= restOfPhrase.length) { // Erasing from second (colored) word
+                        currentVisibleRest = restOfPhrase + `<span style="color:${color};">${secondWord.substring(0, (charIndex - 1) - restOfPhrase.length)}</span>`;
+                    } else { // Erasing from first part of the rest
+                        currentVisibleRest = restOfPhrase.substring(0, charIndex - 1);
+                    }
+                    typedRestSpan.innerHTML = currentVisibleRest;
+                    charIndex--;
+                    setTimeout(animateHeroText, erasingSpeed);
+                } else { // Finished erasing typedRestSpan
+                    isDeleting = false;
+                    sentenceIndex = (sentenceIndex + 1) % phrases.length;
+                    charIndex = 0;
+                    if (sentenceIndex === 0) { // Completed a full loop
+                        initialCDone = true; // From now on, 'C' will be static at the start of each phrase
+                    }
+                    typedRestSpan.innerHTML = ""; // Clear before next phrase if needed
+                    if (!initialCDone && sentenceIndex === 0) { // Reset for initial C typing if loop restarts before C was made static
+                        animatedCSpan.textContent = ""; // Clear C to retype it
+                    }
+                    setTimeout(animateHeroText, newSentenceDelay);
+                }
+            } else {
+                // Typing logic for typedRestSpan
+                if (charIndex < fullRestAndSecond.length) {
+                    let textToShow = "";
+                    if (charIndex < restOfPhrase.length) { // Typing the first part of the rest
+                        textToShow = restOfPhrase.substring(0, charIndex + 1);
+                        typedRestSpan.innerHTML = textToShow;
+                    } else { // Typing the second word (colored)
+                        textToShow = restOfPhrase +
+                            `<span style="color:${color};">${secondWord.substring(0, charIndex - restOfPhrase.length + 1)}</span>`;
+                        typedRestSpan.innerHTML = textToShow;
+                    }
+                    charIndex++;
+                    setTimeout(animateHeroText, typingSpeed);
+                } else { // Finished typing current phrase's rest part
+                    isDeleting = true;
+                    setTimeout(animateHeroText, sentenceEndDelay);
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            if (animatedCSpan && typedRestSpan) {
+                setTimeout(animateHeroText, newSentenceDelay);
+            }
         });
 
     </script>
