@@ -168,6 +168,16 @@
         .hero-bg {
             position: relative;
             overflow: hidden;
+            /* Important for canvas containment */
+        }
+
+        #hero-rain-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
 
         .hero-content {
@@ -307,7 +317,6 @@
         #typing-animation-container {
             font-family: 'Wendy One', cursive;
             min-height: 1.2em;
-            /* Adjusted for very large font, try to keep single line */
             line-height: 1;
         }
 
@@ -352,7 +361,6 @@
 
             #typing-animation-container {
                 min-height: 1.2em;
-                /* Ensure this accommodates text-6xl */
                 line-height: 1;
             }
         }
@@ -399,6 +407,7 @@
     </header>
 
     <section class="min-h-screen flex items-center justify-center hero-bg text-white relative pt-20 bg-black" id="hero">
+        <canvas id="hero-rain-canvas"></canvas>
         <div class="max-w-7xl mx-auto text-center hero-content px-6 flex flex-col items-center">
             <img src="./res/profile.jpg" alt="Divya Paul Profile"
                 class="w-64 h-64 rounded-full mx-auto mb-8 profile-img" data-parallax>
@@ -821,9 +830,9 @@
         const typedRestSpan = document.getElementById("typed-rest-area");
 
         const phrases = [
-            { cPart: "C", rest: "reate ", secondWord: "Ideas", color: "#FFFAA0" },
-            { cPart: "C", rest: "raft ", secondWord: "Experiences", color: "#FFB347" },
-            { cPart: "C", rest: "onnecting ", secondWord: "People", color: "#FFB6C1" }
+            { cPart: "C", rest: "reate ", secondWord: "Ideas", color: "#FFFAA0" },    // Pastel Yellow
+            { cPart: "C", rest: "raft ", secondWord: "Experiences", color: "#FFB347" }, // Pastel Orange
+            { cPart: "C", rest: "onnecting ", secondWord: "People", color: "#FFB6C1" } // Pastel Pink
         ];
         const typingSpeed = 120;
         const erasingSpeed = 70;
@@ -831,78 +840,113 @@
         const sentenceEndDelay = 2000;
 
         let sentenceIndex = 0;
-        let charIndex = 0; // For the 'rest' + 'secondWord' part
+        let charIndexForRest = 0;
         let isDeleting = false;
-        let initialCDone = false; // True after 'C' of the first phrase is typed and its cycle finishes
+        let initialCAlreadyTypedOnce = false;
+
+        function typeCharacter(targetSpan, text, index, specificColor) {
+            if (index < text.length) {
+                if (specificColor) {
+                    targetSpan.innerHTML += `<span style="color:${specificColor}">${text.charAt(index)}</span>`;
+                } else {
+                    targetSpan.innerHTML += text.charAt(index);
+                }
+                charIndexForRest++;
+                setTimeout(() => typeCharacter(targetSpan, text, index + 1, specificColor), typingSpeed);
+            } else {
+                // Finished typing this part, proceed in main logic
+                setTimeout(animateHeroText, typingSpeed); // Proceed to next step
+            }
+        }
+
+        function eraseCharacters() {
+            if (charIndexForRest > 0) {
+                // Smart erase to handle nested spans correctly
+                let currentHTML = typedRestSpan.innerHTML;
+                if (currentHTML.endsWith('</span>')) {
+                    // Find the start of the last span
+                    const lastSpanStart = currentHTML.lastIndexOf('<span');
+                    const spanContent = currentHTML.substring(lastSpanStart);
+                    const textInSpan = spanContent.replace(/<[^>]*>/g, ""); // Get text content of span
+
+                    if (textInSpan.length > 1) {
+                        const newSpanContent = textInSpan.substring(0, textInSpan.length - 1);
+                        const colorStyleMatch = spanContent.match(/style="color:(.*?);"/)
+                        const color = colorStyleMatch ? colorStyleMatch[1] : phrases[sentenceIndex].color; // Fallback
+                        typedRestSpan.innerHTML = currentHTML.substring(0, lastSpanStart) + `<span style="color:${color};">${newSpanContent}</span>`;
+                    } else { // Erasing the last char of the span, so remove the span
+                        typedRestSpan.innerHTML = currentHTML.substring(0, lastSpanStart);
+                    }
+                } else { // Erasing from the non-colored part
+                    typedRestSpan.innerHTML = currentHTML.substring(0, currentHTML.length - 1);
+                }
+                charIndexForRest--;
+                setTimeout(eraseCharacters, erasingSpeed);
+            } else { // Erasing of typedRestSpan complete
+                isDeleting = false;
+                sentenceIndex = (sentenceIndex + 1) % phrases.length;
+                charIndexForRest = 0; // Reset for the next phrase's "rest" part
+                typedRestSpan.innerHTML = "";
+                setTimeout(animateHeroText, newSentenceDelay);
+            }
+        }
+
 
         async function animateHeroText() {
             if (!animatedCSpan || !typedRestSpan) return;
-
             const currentPhraseData = phrases[sentenceIndex];
-            const restOfPhrase = currentPhraseData.rest;
-            const secondWord = currentPhraseData.secondWord;
-            const fullRestAndSecond = restOfPhrase + secondWord;
-            const color = currentPhraseData.color;
 
-            // Handle the initial 'C'
-            if (!initialCDone && sentenceIndex === 0 && !isDeleting && charIndex === 0 && animatedCSpan.textContent === "") {
-                // Type 'C' only for the very first time
-                animatedCSpan.textContent = "C";
-                // Short pause, then proceed with the rest of the first phrase
-                setTimeout(() => {
-                    charIndex = 0; // Reset for the rest part
-                    animateHeroText(); // Call again to start typing the rest
-                }, 300);
-                return;
-            } else if (initialCDone || sentenceIndex > 0) {
-                // For subsequent phrases or loops, 'C' is static
-                animatedCSpan.textContent = "C";
+            if (!isDeleting && charIndexForRest === 0) { // Beginning to type a new phrase
+                typedRestSpan.innerHTML = ""; // Clear previous phrase's rest
+
+                if (sentenceIndex === 0 && !initialCAlreadyTypedOnce) {
+                    animatedCSpan.textContent = ""; // Clear C to type it
+                    let cIdx = 0;
+                    async function typeInitialC() {
+                        if (cIdx < currentPhraseData.cPart.length) {
+                            animatedCSpan.textContent += currentPhraseData.cPart.charAt(cIdx);
+                            cIdx++;
+                            setTimeout(typeInitialC, typingSpeed);
+                        } else {
+                            initialCAlreadyTypedOnce = true;
+                            charIndexForRest = 0;
+                            typeNextPartOfRest(); // Start typing the rest of the phrase
+                        }
+                    }
+                    typeInitialC();
+                    return;
+                } else {
+                    animatedCSpan.textContent = currentPhraseData.cPart; // Set static C
+                    charIndexForRest = 0;
+                    typeNextPartOfRest(); // Start typing the rest of the phrase
+                }
+            } else if (isDeleting) {
+                eraseCharacters();
+            } else { // Continue typing current phrase if already started
+                typeNextPartOfRest();
             }
+        }
 
+        function typeNextPartOfRest() {
+            const currentPhraseData = phrases[sentenceIndex];
+            const restPart = currentPhraseData.rest;
+            const secondWordPart = currentPhraseData.secondWord;
+            const color = currentPhraseData.color;
+            const fullRestLength = restPart.length + secondWordPart.length;
 
-            if (isDeleting) {
-                // Erasing logic for typedRestSpan
-                if (charIndex > 0) {
-                    let currentVisibleRest = "";
-                    if (charIndex - 1 >= restOfPhrase.length) { // Erasing from second (colored) word
-                        currentVisibleRest = restOfPhrase + `<span style="color:${color};">${secondWord.substring(0, (charIndex - 1) - restOfPhrase.length)}</span>`;
-                    } else { // Erasing from first part of the rest
-                        currentVisibleRest = restOfPhrase.substring(0, charIndex - 1);
-                    }
-                    typedRestSpan.innerHTML = currentVisibleRest;
-                    charIndex--;
-                    setTimeout(animateHeroText, erasingSpeed);
-                } else { // Finished erasing typedRestSpan
-                    isDeleting = false;
-                    sentenceIndex = (sentenceIndex + 1) % phrases.length;
-                    charIndex = 0;
-                    if (sentenceIndex === 0) { // Completed a full loop
-                        initialCDone = true; // From now on, 'C' will be static at the start of each phrase
-                    }
-                    typedRestSpan.innerHTML = ""; // Clear before next phrase if needed
-                    if (!initialCDone && sentenceIndex === 0) { // Reset for initial C typing if loop restarts before C was made static
-                        animatedCSpan.textContent = ""; // Clear C to retype it
-                    }
-                    setTimeout(animateHeroText, newSentenceDelay);
+            if (charIndexForRest < fullRestLength) {
+                if (charIndexForRest < restPart.length) {
+                    typedRestSpan.innerHTML = restPart.substring(0, charIndexForRest + 1);
+                } else {
+                    typedRestSpan.innerHTML = restPart +
+                        `<span style="color:${color};">${secondWordPart.substring(0, charIndexForRest - restPart.length + 1)}</span>`;
                 }
-            } else {
-                // Typing logic for typedRestSpan
-                if (charIndex < fullRestAndSecond.length) {
-                    let textToShow = "";
-                    if (charIndex < restOfPhrase.length) { // Typing the first part of the rest
-                        textToShow = restOfPhrase.substring(0, charIndex + 1);
-                        typedRestSpan.innerHTML = textToShow;
-                    } else { // Typing the second word (colored)
-                        textToShow = restOfPhrase +
-                            `<span style="color:${color};">${secondWord.substring(0, charIndex - restOfPhrase.length + 1)}</span>`;
-                        typedRestSpan.innerHTML = textToShow;
-                    }
-                    charIndex++;
-                    setTimeout(animateHeroText, typingSpeed);
-                } else { // Finished typing current phrase's rest part
-                    isDeleting = true;
-                    setTimeout(animateHeroText, sentenceEndDelay);
-                }
+                charIndexForRest++;
+                setTimeout(typeNextPartOfRest, typingSpeed);
+            } else { // Finished typing the whole "rest" part
+                isDeleting = true;
+                // charIndexForRest is already at fullRestLength, set for erasing
+                setTimeout(animateHeroText, sentenceEndDelay); // Start erasing
             }
         }
 
@@ -912,6 +956,124 @@
             }
         });
 
+        // Bouncing Balls Animation Logic (Replaces previous rain fill)
+        document.addEventListener("DOMContentLoaded", function () {
+            const canvas = document.getElementById('hero-rain-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const heroSection = document.getElementById('hero');
+
+            const pastelColors = [
+                { rgb: "173, 216, 230" }, // Light Pastel Blue
+                { rgb: "255, 250, 160" }, // Pastel Yellow
+                { rgb: "255, 182, 193" }, // Pastel Pink
+                { rgb: "152, 251, 152" }  // Pale Green
+            ];
+            let currentColorIndexForBalls = 0;
+            let framesSinceLastColorChange = 0;
+            const framesPerColorChange = 300; // Approx every 5 seconds at 60fps
+
+            let balls = [];
+            const numBallsToCreatePerFrame = 1;
+            const ballOpacity = 0.8;
+            let animationFrameId_balls;
+
+            function resizeCanvasBalls() {
+                if (!heroSection || !canvas) return;
+                canvas.width = heroSection.offsetWidth;
+                canvas.height = heroSection.offsetHeight;
+            }
+            window.addEventListener('resize', resizeCanvasBalls);
+
+            class Ball {
+                constructor() {
+                    this.radius = Math.random() * 8 + 5; // Ball radius: 5px to 13px
+                    this.x = Math.random() * (canvas.width - this.radius * 2) + this.radius;
+                    this.y = -this.radius - Math.random() * 50; // Start above screen
+                    this.dy = Math.random() * 2 + 1; // Initial downward speed
+                    this.dx = (Math.random() - 0.5) * 4; // Random horizontal speed
+                    this.gravity = 0.2;
+                    this.elasticity = 0.75;
+                    this.color = `rgba(${pastelColors[currentColorIndexForBalls].rgb}, ${ballOpacity})`;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    ctx.closePath();
+                }
+
+                update() {
+                    this.dy += this.gravity;
+                    this.y += this.dy;
+                    this.x += this.dx;
+
+                    // Bounce off bottom
+                    if (this.y + this.radius > canvas.height) {
+                        this.y = canvas.height - this.radius;
+                        this.dy *= -this.elasticity;
+                        // Dampen dx on floor bounce slightly
+                        this.dx *= 0.98;
+                    }
+                    // Bounce off sides
+                    if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+                        this.dx *= -1;
+                        if (this.x + this.radius > canvas.width) this.x = canvas.width - this.radius;
+                        if (this.x - this.radius < 0) this.x = this.radius;
+                    }
+                }
+            }
+
+            function createBalls() {
+                for (let i = 0; i < numBallsToCreatePerFrame; i++) {
+                    if (Math.random() < 0.25) { // Control density of new balls
+                        balls.push(new Ball());
+                    }
+                }
+            }
+
+            function animateBouncingBalls() {
+                if (!canvas || !ctx || !heroSection) {
+                    console.error("Canvas or hero section not found for ball animation.");
+                    return;
+                }
+                if (heroSection.offsetWidth === 0) {
+                    animationFrameId_balls = requestAnimationFrame(animateBouncingBalls);
+                    return;
+                }
+                if (canvas.width !== heroSection.offsetWidth || canvas.height !== heroSection.offsetHeight) {
+                    resizeCanvasBalls();
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                framesSinceLastColorChange++;
+                if (framesSinceLastColorChange > framesPerColorChange) {
+                    currentColorIndexForBalls = (currentColorIndexForBalls + 1) % pastelColors.length;
+                    framesSinceLastColorChange = 0;
+                }
+
+                createBalls();
+
+                for (let i = balls.length - 1; i >= 0; i--) {
+                    balls[i].update();
+                    balls[i].draw();
+                    // Remove balls that are way off screen or have very little energy on the floor
+                    if (balls[i].y - balls[i].radius > canvas.height + 50 ||
+                        (Math.abs(balls[i].dy) < 0.1 && balls[i].y + balls[i].radius > canvas.height - 2)) {
+                        balls.splice(i, 1);
+                    } else if (balls[i].x + balls[i].radius < -50 || balls[i].x - balls[i].radius > canvas.width + 50) {
+                        balls.splice(i, 1);
+                    }
+                }
+                animationFrameId_balls = requestAnimationFrame(animateBouncingBalls);
+            }
+
+            resizeCanvasBalls();
+            animateBouncingBalls();
+        });
     </script>
     <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'939912b2eb0dc007',t:'MTc0NjIwNTIwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
 </body>
