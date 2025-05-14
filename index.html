@@ -168,7 +168,6 @@
         .hero-bg {
             position: relative;
             overflow: hidden;
-            /* Important for canvas containment */
         }
 
         #hero-rain-canvas {
@@ -830,9 +829,9 @@
         const typedRestSpan = document.getElementById("typed-rest-area");
 
         const phrases = [
-            { cPart: "C", rest: "reate ", secondWord: "Ideas", color: "#FFFAA0" },    // Pastel Yellow
-            { cPart: "C", rest: "raft ", secondWord: "Experiences", color: "#FFB347" }, // Pastel Orange
-            { cPart: "C", rest: "onnecting ", secondWord: "People", color: "#FFB6C1" } // Pastel Pink
+            { cPart: "C", rest: "reate ", secondWord: "Ideas", color: "#FFFAA0" },
+            { cPart: "C", rest: "raft ", secondWord: "Experiences", color: "#FFB347" },
+            { cPart: "C", rest: "onnecting ", secondWord: "People", color: "#FFB6C1" }
         ];
         const typingSpeed = 120;
         const erasingSpeed = 70;
@@ -844,63 +843,16 @@
         let isDeleting = false;
         let initialCAlreadyTypedOnce = false;
 
-        function typeCharacter(targetSpan, text, index, specificColor) {
-            if (index < text.length) {
-                if (specificColor) {
-                    targetSpan.innerHTML += `<span style="color:${specificColor}">${text.charAt(index)}</span>`;
-                } else {
-                    targetSpan.innerHTML += text.charAt(index);
-                }
-                charIndexForRest++;
-                setTimeout(() => typeCharacter(targetSpan, text, index + 1, specificColor), typingSpeed);
-            } else {
-                // Finished typing this part, proceed in main logic
-                setTimeout(animateHeroText, typingSpeed); // Proceed to next step
-            }
-        }
-
-        function eraseCharacters() {
-            if (charIndexForRest > 0) {
-                // Smart erase to handle nested spans correctly
-                let currentHTML = typedRestSpan.innerHTML;
-                if (currentHTML.endsWith('</span>')) {
-                    // Find the start of the last span
-                    const lastSpanStart = currentHTML.lastIndexOf('<span');
-                    const spanContent = currentHTML.substring(lastSpanStart);
-                    const textInSpan = spanContent.replace(/<[^>]*>/g, ""); // Get text content of span
-
-                    if (textInSpan.length > 1) {
-                        const newSpanContent = textInSpan.substring(0, textInSpan.length - 1);
-                        const colorStyleMatch = spanContent.match(/style="color:(.*?);"/)
-                        const color = colorStyleMatch ? colorStyleMatch[1] : phrases[sentenceIndex].color; // Fallback
-                        typedRestSpan.innerHTML = currentHTML.substring(0, lastSpanStart) + `<span style="color:${color};">${newSpanContent}</span>`;
-                    } else { // Erasing the last char of the span, so remove the span
-                        typedRestSpan.innerHTML = currentHTML.substring(0, lastSpanStart);
-                    }
-                } else { // Erasing from the non-colored part
-                    typedRestSpan.innerHTML = currentHTML.substring(0, currentHTML.length - 1);
-                }
-                charIndexForRest--;
-                setTimeout(eraseCharacters, erasingSpeed);
-            } else { // Erasing of typedRestSpan complete
-                isDeleting = false;
-                sentenceIndex = (sentenceIndex + 1) % phrases.length;
-                charIndexForRest = 0; // Reset for the next phrase's "rest" part
-                typedRestSpan.innerHTML = "";
-                setTimeout(animateHeroText, newSentenceDelay);
-            }
-        }
-
-
         async function animateHeroText() {
             if (!animatedCSpan || !typedRestSpan) return;
+
             const currentPhraseData = phrases[sentenceIndex];
 
-            if (!isDeleting && charIndexForRest === 0) { // Beginning to type a new phrase
-                typedRestSpan.innerHTML = ""; // Clear previous phrase's rest
+            if (!isDeleting && charIndexForRest === 0) {
+                typedRestSpan.innerHTML = "";
 
                 if (sentenceIndex === 0 && !initialCAlreadyTypedOnce) {
-                    animatedCSpan.textContent = ""; // Clear C to type it
+                    animatedCSpan.textContent = "";
                     let cIdx = 0;
                     async function typeInitialC() {
                         if (cIdx < currentPhraseData.cPart.length) {
@@ -910,43 +862,73 @@
                         } else {
                             initialCAlreadyTypedOnce = true;
                             charIndexForRest = 0;
-                            typeNextPartOfRest(); // Start typing the rest of the phrase
+                            animateRestOfCurrentPhrase();
                         }
                     }
                     typeInitialC();
                     return;
                 } else {
-                    animatedCSpan.textContent = currentPhraseData.cPart; // Set static C
+                    animatedCSpan.textContent = currentPhraseData.cPart;
                     charIndexForRest = 0;
-                    typeNextPartOfRest(); // Start typing the rest of the phrase
+                    animateRestOfCurrentPhrase();
                 }
-            } else if (isDeleting) {
-                eraseCharacters();
-            } else { // Continue typing current phrase if already started
-                typeNextPartOfRest();
+            } else {
+                animateRestOfCurrentPhrase();
             }
         }
 
-        function typeNextPartOfRest() {
+        async function animateRestOfCurrentPhrase() {
             const currentPhraseData = phrases[sentenceIndex];
             const restPart = currentPhraseData.rest;
             const secondWordPart = currentPhraseData.secondWord;
+            const fullRestAndSecond = restPart + secondWordPart;
             const color = currentPhraseData.color;
-            const fullRestLength = restPart.length + secondWordPart.length;
 
-            if (charIndexForRest < fullRestLength) {
-                if (charIndexForRest < restPart.length) {
-                    typedRestSpan.innerHTML = restPart.substring(0, charIndexForRest + 1);
+            if (isDeleting) {
+                if (charIndexForRest > 0) {
+                    let currentHTML = typedRestSpan.innerHTML;
+                    let endsWithSpan = currentHTML.endsWith('</span>');
+
+                    if (endsWithSpan) {
+                        const lastSpanStart = currentHTML.lastIndexOf('<span');
+                        const firstPartBeforeSpan = currentHTML.substring(0, lastSpanStart);
+                        const spanTagContent = currentHTML.substring(lastSpanStart);
+                        const textInSpan = spanTagContent.replace(/<[^>]*>/g, "");
+
+                        if (textInSpan.length > 1) {
+                            typedRestSpan.innerHTML = firstPartBeforeSpan + `<span style="color:${color};">${textInSpan.substring(0, textInSpan.length - 1)}</span>`;
+                        } else {
+                            typedRestSpan.innerHTML = firstPartBeforeSpan;
+                        }
+                    } else {
+                        typedRestSpan.innerHTML = currentHTML.substring(0, currentHTML.length - 1);
+                    }
+                    charIndexForRest--;
+                    setTimeout(animateRestOfCurrentPhrase, erasingSpeed);
                 } else {
-                    typedRestSpan.innerHTML = restPart +
-                        `<span style="color:${color};">${secondWordPart.substring(0, charIndexForRest - restPart.length + 1)}</span>`;
+                    isDeleting = false;
+                    sentenceIndex = (sentenceIndex + 1) % phrases.length;
+                    charIndexForRest = 0;
+                    typedRestSpan.innerHTML = "";
+                    setTimeout(animateHeroText, newSentenceDelay);
                 }
-                charIndexForRest++;
-                setTimeout(typeNextPartOfRest, typingSpeed);
-            } else { // Finished typing the whole "rest" part
-                isDeleting = true;
-                // charIndexForRest is already at fullRestLength, set for erasing
-                setTimeout(animateHeroText, sentenceEndDelay); // Start erasing
+            } else {
+                if (charIndexForRest < fullRestAndSecond.length) {
+                    let textToShow = "";
+                    if (charIndexForRest < restPart.length) {
+                        textToShow = restPart.substring(0, charIndexForRest + 1);
+                        typedRestSpan.innerHTML = textToShow;
+                    } else {
+                        textToShow = restPart +
+                            `<span style="color:${color};">${secondWordPart.substring(0, charIndexForRest - restPart.length + 1)}</span>`;
+                        typedRestSpan.innerHTML = textToShow;
+                    }
+                    charIndexForRest++;
+                    setTimeout(animateRestOfCurrentPhrase, typingSpeed);
+                } else {
+                    isDeleting = true;
+                    setTimeout(animateRestOfCurrentPhrase, sentenceEndDelay);
+                }
             }
         }
 
@@ -956,7 +938,7 @@
             }
         });
 
-        // Bouncing Balls Animation Logic (Replaces previous rain fill)
+        // Raining Characters Animation Logic
         document.addEventListener("DOMContentLoaded", function () {
             const canvas = document.getElementById('hero-rain-canvas');
             if (!canvas) return;
@@ -969,110 +951,116 @@
                 { rgb: "255, 182, 193" }, // Pastel Pink
                 { rgb: "152, 251, 152" }  // Pale Green
             ];
-            let currentColorIndexForBalls = 0;
-            let framesSinceLastColorChange = 0;
-            const framesPerColorChange = 300; // Approx every 5 seconds at 60fps
+            const charactersToRain = ["U", "X", "I", "D", "V", "Y", "A"];
+            const characterFontSize = 20; // Font size for raining characters
 
-            let balls = [];
-            const numBallsToCreatePerFrame = 1;
-            const ballOpacity = 0.8;
-            let animationFrameId_balls;
+            let particles = [];
+            const numParticlesToCreatePerFrame = 1;
+            const particleOpacity = 0.9; // Slightly more opaque for visibility
+            let animationFrameId_particles;
 
-            function resizeCanvasBalls() {
+            function resizeCanvasParticles() {
                 if (!heroSection || !canvas) return;
                 canvas.width = heroSection.offsetWidth;
                 canvas.height = heroSection.offsetHeight;
+                ctx.font = `${characterFontSize}px 'Wendy One', cursive`; // Apply Wendy One here
             }
-            window.addEventListener('resize', resizeCanvasBalls);
+            window.addEventListener('resize', resizeCanvasParticles);
 
-            class Ball {
+            class CharacterParticle {
                 constructor() {
-                    this.radius = Math.random() * 8 + 5; // Ball radius: 5px to 13px
-                    this.x = Math.random() * (canvas.width - this.radius * 2) + this.radius;
-                    this.y = -this.radius - Math.random() * 50; // Start above screen
-                    this.dy = Math.random() * 2 + 1; // Initial downward speed
-                    this.dx = (Math.random() - 0.5) * 4; // Random horizontal speed
-                    this.gravity = 0.2;
-                    this.elasticity = 0.75;
-                    this.color = `rgba(${pastelColors[currentColorIndexForBalls].rgb}, ${ballOpacity})`;
+                    this.character = charactersToRain[Math.floor(Math.random() * charactersToRain.length)];
+                    this.x = Math.random() * canvas.width;
+                    this.y = -characterFontSize - Math.random() * 50;
+                    this.dy = Math.random() * 1.5 + 1;
+                    this.dx = (Math.random() - 0.5) * 1;
+                    this.gravity = 0.08;
+                    this.elasticity = 0.5 + Math.random() * 0.2; // Varied elasticity 
+                    this.opacity = particleOpacity;
+                    this.fadeSpeed = 0.005 + Math.random() * 0.01;
+                    this.bounced = false;
+                    this.color = `rgba(${pastelColors[Math.floor(Math.random() * pastelColors.length)].rgb}, ${this.opacity})`;
+                    this.rotation = 0; // (Math.random() - 0.5) * 0.02; // Optional slight rotation speed
                 }
 
                 draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    ctx.fill();
-                    ctx.closePath();
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    // ctx.rotate(this.rotation * Math.PI / 180); // If adding rotation
+                    ctx.globalAlpha = this.opacity;
+                    ctx.fillStyle = this.color.substring(0, this.color.lastIndexOf(',')) + `, ${this.opacity})`;
+                    ctx.font = `${characterFontSize}px 'Wendy One', cursive`; // Ensure font is set
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(this.character, 0, 0);
+                    ctx.restore();
+                    ctx.globalAlpha = 1.0;
                 }
 
                 update() {
                     this.dy += this.gravity;
                     this.y += this.dy;
                     this.x += this.dx;
+                    // this.rotation += this.dx * 0.5; // Optional: make rotation linked to horizontal movement
 
-                    // Bounce off bottom
-                    if (this.y + this.radius > canvas.height) {
-                        this.y = canvas.height - this.radius;
+                    if (this.y + (characterFontSize / 2) > canvas.height) {
+                        this.y = canvas.height - (characterFontSize / 2);
                         this.dy *= -this.elasticity;
-                        // Dampen dx on floor bounce slightly
-                        this.dx *= 0.98;
+                        this.dx *= 0.9;
+                        if (!this.bounced) { // Start fading only after first bounce
+                            this.bounced = true;
+                        }
+                        if (Math.abs(this.dy) < 0.5 && this.elasticity < 0.6) this.dy = 0; // Come to rest if not very bouncy
                     }
-                    // Bounce off sides
-                    if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+                    if (this.x + (characterFontSize / 2) > canvas.width || this.x - (characterFontSize / 2) < 0) {
                         this.dx *= -1;
-                        if (this.x + this.radius > canvas.width) this.x = canvas.width - this.radius;
-                        if (this.x - this.radius < 0) this.x = this.radius;
+                        if (this.x + (characterFontSize / 2) > canvas.width) this.x = canvas.width - (characterFontSize / 2) - 1;
+                        if (this.x - (characterFontSize / 2) < 0) this.x = (characterFontSize / 2) + 1;
+                    }
+
+                    if (this.bounced) {
+                        this.opacity -= this.fadeSpeed;
+                        if (this.opacity < 0) this.opacity = 0;
                     }
                 }
             }
 
-            function createBalls() {
-                for (let i = 0; i < numBallsToCreatePerFrame; i++) {
-                    if (Math.random() < 0.25) { // Control density of new balls
-                        balls.push(new Ball());
+            function createCharacterParticles() {
+                for (let i = 0; i < numParticlesToCreatePerFrame; i++) {
+                    if (Math.random() < 0.35) { // Control density 
+                        particles.push(new CharacterParticle());
                     }
                 }
             }
 
-            function animateBouncingBalls() {
+            function animateRainingCharacters() {
                 if (!canvas || !ctx || !heroSection) {
-                    console.error("Canvas or hero section not found for ball animation.");
                     return;
                 }
                 if (heroSection.offsetWidth === 0) {
-                    animationFrameId_balls = requestAnimationFrame(animateBouncingBalls);
+                    animationFrameId_particles = requestAnimationFrame(animateRainingCharacters);
                     return;
                 }
                 if (canvas.width !== heroSection.offsetWidth || canvas.height !== heroSection.offsetHeight) {
-                    resizeCanvasBalls();
+                    resizeCanvasParticles();
                 }
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                framesSinceLastColorChange++;
-                if (framesSinceLastColorChange > framesPerColorChange) {
-                    currentColorIndexForBalls = (currentColorIndexForBalls + 1) % pastelColors.length;
-                    framesSinceLastColorChange = 0;
-                }
+                createCharacterParticles();
 
-                createBalls();
-
-                for (let i = balls.length - 1; i >= 0; i--) {
-                    balls[i].update();
-                    balls[i].draw();
-                    // Remove balls that are way off screen or have very little energy on the floor
-                    if (balls[i].y - balls[i].radius > canvas.height + 50 ||
-                        (Math.abs(balls[i].dy) < 0.1 && balls[i].y + balls[i].radius > canvas.height - 2)) {
-                        balls.splice(i, 1);
-                    } else if (balls[i].x + balls[i].radius < -50 || balls[i].x - balls[i].radius > canvas.width + 50) {
-                        balls.splice(i, 1);
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update();
+                    particles[i].draw();
+                    if (particles[i].opacity <= 0.01 || particles[i].y > canvas.height + characterFontSize * 3) { // Remove if faded or far off screen
+                        particles.splice(i, 1);
                     }
                 }
-                animationFrameId_balls = requestAnimationFrame(animateBouncingBalls);
+                animationFrameId_particles = requestAnimationFrame(animateRainingCharacters);
             }
 
-            resizeCanvasBalls();
-            animateBouncingBalls();
+            resizeCanvasParticles();
+            animateRainingCharacters();
         });
     </script>
     <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'939912b2eb0dc007',t:'MTc0NjIwNTIwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
