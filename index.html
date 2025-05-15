@@ -42,13 +42,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&family=Poppins:wght@700&family=Cormorant+Garamond:wght@700&family=Nunito+Sans:wght@700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&family=Poppins:wght@700&display=swap"
         rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background: #f8f8f8;
-            /* Changed from #fff1e5 to off-white */
             color: #000000;
             overflow-x: hidden;
         }
@@ -76,7 +75,6 @@
 
         .card {
             background: #f8f8f8;
-            /* Changed from #fff1e5 to off-white */
             border-radius: 16px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.05);
         }
@@ -206,15 +204,18 @@
 
         #typing-animation-container {
             min-height: 1.2em;
-            line-height: 1;
+            line-height: 1.2;
         }
 
         .cursor {
             display: inline-block;
             width: 3px;
-            height: 0.9em;
+            /* Adjusted for better visibility with larger fonts */
+            height: 1em;
+            /* Relative to its own font-size */
             background-color: #FFFFFF;
-            margin-left: 5px;
+            margin-left: 6px;
+            /* Slightly increased margin */
             animation: blink 0.7s infinite;
             vertical-align: baseline;
         }
@@ -230,6 +231,51 @@
                 opacity: 0;
             }
         }
+
+        /* FAB Styling */
+        #resume-fab {
+            width: 3.5rem;
+            /* 56px */
+            height: 3.5rem;
+            /* 56px */
+            padding: 0;
+            /* Remove padding for icon-only base state */
+        }
+
+        #resume-fab .fab-text {
+            opacity: 0;
+            max-width: 0;
+            transition: opacity 0.2s ease-in-out, max-width 0.3s ease-in-out;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        #resume-fab:hover {
+            width: auto;
+            /* Allow width to expand based on content */
+            padding-left: 1rem;
+            /* Add padding when expanded */
+            padding-right: 1.25rem;
+        }
+
+        #resume-fab:hover .fab-text {
+            opacity: 1;
+            max-width: 200px;
+            /* Arbitrary large enough value */
+            margin-left: 0.5rem;
+        }
+
+        #resume-fab .fab-icon-container {
+            width: 3.5rem;
+            /* Ensure icon container keeps FAB size */
+            height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            /* Prevent icon container from shrinking */
+        }
+
 
         @media (max-width: 768px) {
             .timeline::before {
@@ -250,9 +296,41 @@
 
             #typing-animation-container {
                 min-height: 1.2em;
-                line-height: 1;
+                line-height: 1.2;
+            }
+
+            /* On mobile, FAB remains icon-only, hover effect is for desktop */
+            #resume-fab:hover {
+                width: 3.5rem;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            #resume-fab:hover .fab-text {
+                opacity: 0;
+                max-width: 0;
+                margin-left: 0;
             }
         }
+
+        @media (max-width: 639px) {
+
+            /* xs screens */
+            .hero-buttons a {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                font-size: 0.875rem;
+                /* text-sm */
+            }
+
+            .contact-buttons a {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                font-size: 0.875rem;
+                /* text-sm */
+            }
+        }
+
 
         @media print {
             body * {
@@ -274,39 +352,36 @@
 
 <body>
     <a href="./res/resume.pdf" download id="resume-fab"
-        class="fixed top-6 right-6 bg-black text-white h-14 rounded-full flex items-center shadow-lg z-50 group overflow-hidden transition-all duration-300 ease-in-out w-14 hover:w-auto hover:px-4">
-        <div class="flex items-center justify-center w-14 h-14 flex-shrink-0">
+        class="fixed bottom-6 right-6 bg-black text-white rounded-full flex items-center shadow-xl z-50 transition-all duration-300 ease-in-out">
+        <div class="fab-icon-container">
             <i class="fas fa-download text-xl"></i>
         </div>
-        <span
-            class="ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out delay-150 group-hover:delay-0">Download
-            Resume</span>
+        <span class="fab-text">Download Resume</span>
     </a>
 
     <section class="min-h-screen flex items-center justify-center hero-bg text-white relative pt-20 bg-black" id="hero">
         <canvas id="hero-rain-canvas"></canvas>
         <div class="max-w-7xl mx-auto text-center hero-content px-6 flex flex-col items-center">
             <img src="./res/profile.jpg" alt="Divya Paul Profile"
-                class="w-64 h-64 rounded-full mx-auto mb-8 profile-img" data-parallax>
+                class="w-48 h-48 sm:w-64 sm:h-64 rounded-full mx-auto mb-8 profile-img" data-parallax>
             <h1 class="text-5xl md:text-7xl font-bold mb-4">Divya Paul</h1>
             <p class="text-xl md:text-2xl mb-8">Google Certified UI/UX Designer | Front End/UI Designer</p>
-            <div
-                class="flex flex-col sm:flex-row justify-center items-center sm:space-x-4 space-y-4 sm:space-y-0 mb-8 md:mb-12">
+            <div class="flex flex-wrap justify-center items-center gap-x-4 gap-y-3 mb-8 md:mb-12 hero-buttons">
                 <a href="mailto:pauledivya@live.com"
-                    class="px-8 py-3 bg-white text-black rounded-full hover:bg-gray-200 hover:text-black transition-colors duration-300 text-lg flex items-center justify-center hover-scale font-medium">
+                    class="px-6 py-3 bg-white text-black rounded-full hover:bg-gray-200 transition-colors duration-300 text-base lg:text-lg flex items-center justify-center hover-scale font-medium">
                     <i class="fas fa-envelope social-icon mr-2"></i> Contact Me
                 </a>
                 <a href="https://divyapaul.com/" target="_blank"
-                    class="px-8 py-3 bg-transparent border-2 border-white text-white rounded-full hover:bg-white hover:text-black transition-colors duration-300 text-lg flex items-center justify-center hover-scale">
+                    class="px-6 py-3 bg-transparent border-2 border-white text-white rounded-full hover:bg-white hover:text-black transition-colors duration-300 text-base lg:text-lg flex items-center justify-center hover-scale">
                     <i class="fas fa-briefcase social-icon mr-2"></i> Portfolio
                 </a>
                 <a href="https://www.linkedin.com/in/amdivyapaul/" target="_blank"
-                    class="px-8 py-3 bg-transparent border-2 border-white text-white rounded-full hover:bg-white hover:text-black transition-colors duration-300 text-lg flex items-center justify-center hover-scale">
+                    class="px-6 py-3 bg-transparent border-2 border-white text-white rounded-full hover:bg-white hover:text-black transition-colors duration-300 text-base lg:text-lg flex items-center justify-center hover-scale">
                     <i class="fab fa-linkedin social-icon mr-2"></i> LinkedIn
                 </a>
             </div>
             <div id="typing-animation-container"
-                class="text-6xl md:text-8xl font-bold text-center mt-8 md:mt-12 min-h-[1.2em]">
+                class="font-bold text-center mt-8 md:mt-12 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
                 <span id="animated-c-area" class="text-white"></span><span id="typed-rest-area"
                     class="text-white"></span><span class="cursor"></span>
             </div>
@@ -316,22 +391,22 @@
     <section class="py-20 px-6 section" id="about" style="background-color: #f8f8f8;">
         <div class="max-w-7xl mx-auto">
             <h2 class="text-4xl font-bold mb-12 text-center brick-red">About Me</h2>
-            <div class="card p-8">
-                <p class="text-lg leading-relaxed mb-4">
+            <div class="card p-6 md:p-8">
+                <p class="text-base md:text-lg leading-relaxed mb-4">
                     I am a Google Certified UI/UX Designer and Front End/UI Designer with over a decade of experience
                     crafting intuitive, user-centered digital experiences. Based in Dubai, my passion lies in
                     transforming complex ideas into seamless, visually captivating designs that resonate with users and
                     drive business success. Specializing in user research, wireframing, prototyping, and Android
                     development, I thrive at the intersection of creativity and technical precision.
                 </p>
-                <p class="text-lg leading-relaxed mb-4">
+                <p class="text-base md:text-lg leading-relaxed mb-4">
                     My approach is deeply collaborative, working closely with product managers, developers, and
                     stakeholders to align designs with strategic goals. I excel in conducting usability testing and
                     leveraging data-driven insights to refine interfaces, ensuring accessibility and engagement. As a
                     mentor, I enjoy guiding junior designers, sharing expertise in tools like Figma and Adobe XD, and
                     fostering a culture of innovation.
                 </p>
-                <p class="text-lg leading-relaxed">
+                <p class="text-base md:text-lg leading-relaxed">
                     From leading high-impact projects at R2 International to delivering bespoke solutions as a freelance
                     consultant, my career reflects a commitment to excellence and continuous learning. Whether designing
                     responsive web interfaces or optimizing mobile apps, I am driven by the challenge of creating
@@ -345,21 +420,24 @@
         <canvas id="skills-particle-canvas" class="particle-canvas"></canvas>
         <div class="max-w-7xl mx-auto">
             <h2 class="text-4xl font-bold mb-12 text-center text-white">Skills</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                 <div class="card-dark p-6 hover-scale">
                     <h3 class="text-xl font-semibold mb-4 text-white">Design</h3>
-                    <p>Information Architecture, Interaction Design, User Research, Usability Testing, Wireframes, Task
+                    <p class="text-sm md:text-base">Information Architecture, Interaction Design, User Research,
+                        Usability Testing, Wireframes, Task
                         Flows, Competitive & Heuristic Analysis, Visual Design, Prototyping, Motion Design, Video
                         Creation</p>
                 </div>
                 <div class="card-dark p-6 hover-scale">
                     <h3 class="text-xl font-semibold mb-4 text-white">Development</h3>
-                    <p>HTML, CSS, Java, XML, Material Design, Android Development, REST APIs, WOWZA Media Server, Amazon
+                    <p class="text-sm md:text-base">HTML, CSS, Java, XML, Material Design, Android Development, REST
+                        APIs, WOWZA Media Server, Amazon
                         S3</p>
                 </div>
                 <div class="card-dark p-6 hover-scale">
                     <h3 class="text-xl font-semibold mb-4 text-white">Tools</h3>
-                    <p>Sketch, Figma, Adobe XD, HTML/CSS Proto, Canva, ProCreate, Final Cut Pro</p>
+                    <p class="text-sm md:text-base">Sketch, Figma, Adobe XD, HTML/CSS Proto, Canva, ProCreate, Final Cut
+                        Pro</p>
                 </div>
             </div>
         </div>
@@ -372,8 +450,8 @@
                 <div class="timeline-item">
                     <div class="card p-6">
                         <h3 class="text-2xl font-semibold brick-red">UI/UX Designer - Freelance Consultant</h3>
-                        <p class="text-gray-500">2021 - Present</p>
-                        <ul class="list-disc pl-6 mt-4">
+                        <p class="text-gray-500 text-sm md:text-base">2021 - Present</p>
+                        <ul class="list-disc pl-6 mt-4 text-sm md:text-base space-y-1">
                             <li>Designed and delivered user-centric mobile and web experiences for clients like
                                 Alternative Healthcare, Oushadhalayam, and Eezee Shopping LLC, increasing user
                                 engagement by up to 25% through intuitive interfaces.</li>
@@ -390,8 +468,8 @@
                 <div class="timeline-item">
                     <div class="card p-6">
                         <h3 class="text-2xl font-semibold brick-red">Lead Android Developer - R2 International</h3>
-                        <p class="text-gray-500">2015 - 2016</p>
-                        <ul class="list-disc pl-6 mt-4">
+                        <p class="text-gray-500 text-sm md:text-base">2015 - 2016</p>
+                        <ul class="list-disc pl-6 mt-4 text-sm md:text-base space-y-1">
                             <li>Promoted to Lead Android Developer within 4 years, overseeing a team of 5 developers and
                                 managing end-to-end development of Android applications for European markets.</li>
                             <li>Spearheaded the development of a medical application with a custom subtitle player,
@@ -407,8 +485,8 @@
                 <div class="timeline-item">
                     <div class="card p-6">
                         <h3 class="text-2xl font-semibold brick-red">Senior Android Developer - R2 International</h3>
-                        <p class="text-gray-500">2013 - 2015</p>
-                        <ul class="list-disc pl-6 mt-4">
+                        <p class="text-gray-500 text-sm md:text-base">2013 - 2015</p>
+                        <ul class="list-disc pl-6 mt-4 text-sm md:text-base space-y-1">
                             <li>Earned promotion to Senior Android Developer after demonstrating expertise in Java, XML,
                                 and Material Design, leading complex feature development for social content publishing
                                 apps.</li>
@@ -425,8 +503,8 @@
                 <div class="timeline-item">
                     <div class="card p-6">
                         <h3 class="text-2xl font-semibold brick-red">Junior Android Developer - R2 International</h3>
-                        <p class="text-gray-500">2011 - 2013</p>
-                        <ul class="list-disc pl-6 mt-4">
+                        <p class="text-gray-500 text-sm md:text-base">2011 - 2013</p>
+                        <ul class="list-disc pl-6 mt-4 text-sm md:text-base space-y-1">
                             <li>Started as a Junior Android Developer, writing clean, scalable code under senior
                                 supervision and contributing to UI/UX design for Android applications.</li>
                             <li>Developed user interfaces using XML layouts, improving navigation and reducing bounce
@@ -450,16 +528,18 @@
                 <div class="timeline-item">
                     <div class="card-dark p-6">
                         <h3 class="text-2xl font-semibold text-white">Master of Computer Application</h3>
-                        <p class="text-gray-400">Kristu Jayanti College, 2008 - 2011</p>
-                        <p class="mt-2">Specialized in .NET, Java, Microcontrollers, and Embedded Programming. Completed
+                        <p class="text-gray-400 text-sm md:text-base">Kristu Jayanti College, 2008 - 2011</p>
+                        <p class="mt-2 text-sm md:text-base">Specialized in .NET, Java, Microcontrollers, and Embedded
+                            Programming. Completed
                             a 6-month internship as a .NET Developer, later hired as a Software Engineer.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
                     <div class="card-dark p-6">
                         <h3 class="text-2xl font-semibold text-white">Google UX Design Certification</h3>
-                        <p class="text-gray-400">2021 - 2022</p>
-                        <p class="mt-2">Covered UX Design Process, Wireframing, Prototyping, User Research, and
+                        <p class="text-gray-400 text-sm md:text-base">2021 - 2022</p>
+                        <p class="mt-2 text-sm md:text-base">Covered UX Design Process, Wireframing, Prototyping, User
+                            Research, and
                             Responsive Web Design with Adobe XD and Figma.</p>
                     </div>
                 </div>
@@ -471,21 +551,21 @@
         <div class="max-w-7xl mx-auto text-center">
             <h2 class="text-4xl font-bold mb-12 brick-red">Get in Touch</h2>
             <p class="text-lg mb-8">Interested in collaborating or discussing a project? Reach out!</p>
-            <div class="flex flex-col sm:flex-row justify-center items-center sm:space-x-4 space-y-4 sm:space-y-0">
+            <div class="flex flex-wrap justify-center items-center gap-x-4 gap-y-3 contact-buttons">
                 <a href="mailto:pauledivya@live.com"
-                    class="px-8 py-3 bg-transparent border-2 brick-red-border text-brick-red rounded-full hover:bg-brick-red hover:text-white hover-scale text-lg flex items-center justify-center">
+                    class="px-6 py-3 bg-transparent border-2 brick-red-border text-brick-red rounded-full hover:bg-brick-red hover:text-white hover-scale text-base lg:text-lg flex items-center justify-center">
                     <i class="fas fa-envelope social-icon mr-2"></i> Email Me
                 </a>
                 <a href="https://divyapaul.com/" target="_blank"
-                    class="px-8 py-3 bg-transparent border-2 brick-red-border text-brick-red rounded-full hover:bg-brick-red hover:text-white hover-scale text-lg flex items-center justify-center">
+                    class="px-6 py-3 bg-transparent border-2 brick-red-border text-brick-red rounded-full hover:bg-brick-red hover:text-white hover-scale text-base lg:text-lg flex items-center justify-center">
                     <i class="fas fa-briefcase social-icon mr-2"></i> View Portfolio
                 </a>
                 <a href="https://www.linkedin.com/in/amdivyapaul/" target="_blank"
-                    class="px-8 py-3 bg-transparent border-2 brick-red-border text-brick-red rounded-full hover:bg-brick-red hover:text-white hover-scale text-lg flex items-center justify-center">
+                    class="px-6 py-3 bg-transparent border-2 brick-red-border text-brick-red rounded-full hover:bg-brick-red hover:text-white hover-scale text-base lg:text-lg flex items-center justify-center">
                     <i class="fab fa-linkedin social-icon mr-2"></i> LinkedIn
                 </a>
             </div>
-            <p class="mt-8 text-lg">Phone: +971 558191264 | Location: Dubai, UAE</p>
+            <p class="mt-8 text-base md:text-lg">Phone: +971 558191264 | Location: Dubai, UAE</p>
         </div>
     </section>
 
@@ -532,7 +612,7 @@
             ease: "expo.out",
             delay: 0.6
         });
-        gsap.from("#hero .flex-col.sm\\:flex-row a", {
+        gsap.from("#hero .hero-buttons a", {
             duration: 0.8,
             opacity: 0,
             y: 20,
