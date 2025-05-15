@@ -206,7 +206,6 @@
             transform: translateY(-3px);
         }
 
-        /* Ensure contact buttons with these classes get black hover background */
         #contact .brick-red-border.text-brick-red:hover {
             background-color: #000000;
             color: #ffffff;
@@ -261,6 +260,22 @@
             #typing-animation-container {
                 min-height: 1.2em;
                 line-height: 1;
+            }
+        }
+
+        @media print {
+            body * {
+                display: none !important;
+            }
+
+            body:after {
+                content: "Printing this content is not allowed.";
+                display: block !important;
+                text-align: center;
+                font-size: 20px;
+                color: black !important;
+                background: white !important;
+                padding: 20px;
             }
         }
     </style>
@@ -701,10 +716,10 @@
             const heroSection = document.getElementById('hero');
 
             const pastelColors = [
-                { rgb: "173, 216, 230" }, // Light Pastel Blue
-                { rgb: "255, 250, 160" }, // Pastel Yellow
-                { rgb: "255, 182, 193" }, // Pastel Pink
-                { rgb: "152, 251, 152" }  // Pale Green
+                { rgb: "173, 216, 230" },
+                { rgb: "255, 250, 160" },
+                { rgb: "255, 182, 193" },
+                { rgb: "152, 251, 152" }
             ];
             const charactersToRain = ["U", "X", "I", "D", "V", "Y", "A"];
             const characterFontSize = 20;
@@ -815,6 +830,28 @@
             resizeCanvasParticles();
             animateRainingCharacters();
         });
+
+        // Deterrents for right-click and common keyboard shortcuts for dev tools/view source
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', function (event) {
+            // Ctrl+Shift+I
+            if (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'i')) {
+                event.preventDefault();
+            }
+            // Ctrl+Shift+J
+            if (event.ctrlKey && event.shiftKey && (event.key === 'J' || event.key === 'j')) {
+                event.preventDefault();
+            }
+            // Ctrl+U
+            if (event.ctrlKey && (event.key === 'U' || event.key === 'u')) {
+                event.preventDefault();
+            }
+            // F12
+            if (event.key === 'F12') {
+                event.preventDefault();
+            }
+        });
+
     </script>
     <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'939912b2eb0dc007',t:'MTc0NjIwNTIwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
 </body>
