@@ -11,23 +11,15 @@
                 var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
                 var firstSheetName = workbook.SheetNames[0];
                 var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
                 var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
                 var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
                 var headerRowIndex = filteredData.findIndex((row, index) =>
                     row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                 );
-                // Fallback
                 if (headerRowIndex === -1 || headerRowIndex > 25) {
                     headerRowIndex = 0;
                 }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
                 csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
                 return csv;
             } catch (e) {
@@ -50,7 +42,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&family=Wendy+One&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&family=Poppins:wght@700&family=Cormorant+Garamond:wght@700&family=Nunito+Sans:wght@700&display=swap"
         rel="stylesheet">
     <style>
         body {
@@ -84,7 +76,6 @@
 
         .card {
             background: #fff1e5;
-            /* Default card background */
             border-radius: 16px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.05);
         }
@@ -92,7 +83,6 @@
         #about .card,
         #experience .card {
             background: #ffffff;
-            /* White background for cards in specific sections */
         }
 
         .card-dark {
@@ -112,21 +102,17 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
             object-fit: cover;
             filter: grayscale(100%);
-            /* Monochrome tint */
         }
 
         .brick-red {
-            /* Changed to black */
             color: #000000;
         }
 
         .brick-red-bg {
-            /* Changed to black */
             background-color: #000000;
         }
 
         .brick-red-border {
-            /* Changed to black */
             border-color: #000000;
         }
 
@@ -148,7 +134,6 @@
             bottom: 0;
             width: 4px;
             background: #000000;
-            /* Changed from brick-red */
         }
 
         .timeline-item {
@@ -165,10 +150,8 @@
             width: 16px;
             height: 16px;
             background: #000000;
-            /* Changed from brick-red */
             border-radius: 50%;
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-            /* Adjusted shadow for black */
         }
 
         #education.bg-black .timeline::before,
@@ -180,23 +163,32 @@
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
         }
 
-        .hero-bg {
+        .hero-bg,
+        #skills,
+        #education {
             position: relative;
             overflow: hidden;
         }
 
-        #hero-rain-canvas {
+        #hero-rain-canvas,
+        .particle-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero-content,
+        #skills>.max-w-7xl,
+        #education>.max-w-7xl {
+            position: relative;
+            z-index: 2;
         }
 
         .hero-content {
-            position: relative;
-            z-index: 2;
             background: none;
         }
 
@@ -211,9 +203,7 @@
             color: #ffffff;
         }
 
-
         #typing-animation-container {
-            font-family: 'Wendy One', cursive;
             min-height: 1.2em;
             line-height: 1;
         }
@@ -351,6 +341,7 @@
     </section>
 
     <section class="py-20 px-6 bg-black text-gray-300" id="skills">
+        <canvas id="skills-particle-canvas" class="particle-canvas"></canvas>
         <div class="max-w-7xl mx-auto section">
             <h2 class="text-4xl font-bold mb-12 text-center text-white">Skills</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -451,6 +442,7 @@
     </section>
 
     <section class="py-20 px-6 bg-black text-gray-300" id="education">
+        <canvas id="education-particle-canvas" class="particle-canvas"></canvas>
         <div class="max-w-7xl mx-auto section">
             <h2 class="text-4xl font-bold mb-12 text-center text-white">Education & Certifications</h2>
             <div class="relative timeline">
@@ -500,7 +492,6 @@
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
-        // Section Animations
         gsap.utils.toArray(".section").forEach((section) => {
             gsap.fromTo(
                 section,
@@ -520,7 +511,6 @@
             );
         });
 
-        // Hero Section Animations
         gsap.from("#hero .profile-img", {
             duration: 1,
             scale: 0.7,
@@ -594,14 +584,15 @@
             });
         });
 
-        // Typing Animation Logic
         const animatedCSpan = document.getElementById("animated-c-area");
         const typedRestSpan = document.getElementById("typed-rest-area");
+        const typingContainer = document.getElementById('typing-animation-container');
+
 
         const phrases = [
-            { cPart: "C", rest: "reate ", secondWord: "Ideas", color: "#FFFAA0" },
-            { cPart: "C", rest: "raft ", secondWord: "Experiences", color: "#FFB347" },
-            { cPart: "C", rest: "onnecting ", secondWord: "People", color: "#FFB6C1" }
+            { cPart: "C", rest: "reate ", secondWord: "Ideas", color: "#FFFAA0", fontFamily: "'Poppins', sans-serif" },
+            { cPart: "C", rest: "raft ", secondWord: "Experiences", color: "#FFB347", fontFamily: "'Cormorant Garamond', serif" },
+            { cPart: "C", rest: "onnecting ", secondWord: "People", color: "#FFB6C1", fontFamily: "'Poppins', sans-serif" }
         ];
         const typingSpeed = 120;
         const erasingSpeed = 70;
@@ -614,9 +605,13 @@
         let initialCAlreadyTypedOnce = false;
 
         async function animateHeroText() {
-            if (!animatedCSpan || !typedRestSpan) return;
+            if (!animatedCSpan || !typedRestSpan || !typingContainer) return;
 
             const currentPhraseData = phrases[sentenceIndex];
+            if (typingContainer && currentPhraseData.fontFamily) {
+                typingContainer.style.fontFamily = currentPhraseData.fontFamily;
+            }
+
 
             if (!isDeleting && charIndexForRest === 0) {
                 typedRestSpan.innerHTML = "";
@@ -702,151 +697,170 @@
             }
         }
 
+        const globalMouse = { x: undefined, y: undefined, radius: 120 };
+        window.addEventListener('mousemove', function (event) {
+            globalMouse.x = event.clientX;
+            globalMouse.y = event.clientY;
+        });
+        window.addEventListener('mouseleave', function () {
+            globalMouse.x = undefined;
+            globalMouse.y = undefined;
+        });
+
+        class Particle {
+            constructor(x, y, size, color, speedX, speedY, canvasElem) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.color = color;
+                this.speedX = speedX;
+                this.speedY = speedY;
+                this.canvas = canvasElem;
+            }
+            draw() {
+                const currentCtx = this.canvas.getContext('2d');
+                currentCtx.fillStyle = this.color;
+                currentCtx.beginPath();
+                currentCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                currentCtx.closePath();
+                currentCtx.fill();
+            }
+            update() {
+                if (globalMouse.x !== undefined && globalMouse.y !== undefined) {
+                    let canvasRect = this.canvas.getBoundingClientRect();
+                    let mouseXOnCanvas = globalMouse.x - canvasRect.left;
+                    let mouseYOnCanvas = globalMouse.y - canvasRect.top;
+
+                    let dx = mouseXOnCanvas - this.x;
+                    let dy = mouseYOnCanvas - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < globalMouse.radius) {
+                        let forceDirectionX = dx / distance;
+                        let forceDirectionY = dy / distance;
+                        let maxDistance = globalMouse.radius;
+                        let force = (maxDistance - distance) / maxDistance;
+                        this.x -= forceDirectionX * force * 3;
+                        this.y -= forceDirectionY * force * 3;
+                    }
+                }
+
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x - this.size > this.canvas.width) this.x = -this.size;
+                if (this.x + this.size < 0) this.x = this.canvas.width + this.size;
+                if (this.y - this.size > this.canvas.height) this.y = -this.size;
+                if (this.y + this.size < 0) this.y = this.canvas.height + this.size;
+
+                this.draw();
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
             if (animatedCSpan && typedRestSpan) {
                 setTimeout(animateHeroText, newSentenceDelay);
             }
-        });
 
-        // Raining Characters Animation Logic
-        document.addEventListener("DOMContentLoaded", function () {
-            const canvas = document.getElementById('hero-rain-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const heroSection = document.getElementById('hero');
+            function createParticleSystem(canvasElement, sectionElement) {
+                if (!canvasElement || !sectionElement) {
+                    return;
+                }
+                const ctx = canvasElement.getContext('2d');
+                let particlesArray = [];
+                const calculateNumberOfParticles = () => Math.min(80, Math.floor((canvasElement.width * canvasElement.height) / 20000)) || 30;
 
-            const pastelColors = [
-                { rgb: "173, 216, 230" },
-                { rgb: "255, 250, 160" },
-                { rgb: "255, 182, 193" },
-                { rgb: "152, 251, 152" }
-            ];
-            const charactersToRain = ["U", "X", "I", "D", "V", "Y", "A"];
-            const characterFontSize = 20;
 
-            let particles = [];
-            const numParticlesToCreatePerFrame = 1;
-            const particleOpacity = 0.9;
-            let animationFrameId_particles;
-
-            function resizeCanvasParticles() {
-                if (!heroSection || !canvas) return;
-                canvas.width = heroSection.offsetWidth;
-                canvas.height = heroSection.offsetHeight;
-                ctx.font = `${characterFontSize}px 'Wendy One', cursive`;
-            }
-            window.addEventListener('resize', resizeCanvasParticles);
-
-            class CharacterParticle {
-                constructor() {
-                    this.character = charactersToRain[Math.floor(Math.random() * charactersToRain.length)];
-                    this.x = Math.random() * canvas.width;
-                    this.y = -characterFontSize - Math.random() * 50;
-                    this.dy = Math.random() * 1.5 + 1;
-                    this.dx = (Math.random() - 0.5) * 1;
-                    this.gravity = 0.08;
-                    this.elasticity = 0.5 + Math.random() * 0.2;
-                    this.opacity = particleOpacity;
-                    this.fadeSpeed = 0.005 + Math.random() * 0.01;
-                    this.bounced = false;
-                    this.color = `rgba(${pastelColors[Math.floor(Math.random() * pastelColors.length)].rgb}, ${this.opacity})`;
-                    this.rotation = 0;
+                function setCanvasDimensions() {
+                    canvasElement.width = sectionElement.offsetWidth;
+                    canvasElement.height = sectionElement.offsetHeight;
                 }
 
-                draw() {
-                    ctx.save();
-                    ctx.translate(this.x, this.y);
-                    ctx.globalAlpha = this.opacity;
-                    ctx.fillStyle = this.color.substring(0, this.color.lastIndexOf(',')) + `, ${this.opacity})`;
-                    ctx.font = `${characterFontSize}px 'Wendy One', cursive`;
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.fillText(this.character, 0, 0);
-                    ctx.restore();
-                    ctx.globalAlpha = 1.0;
+                function initParticles() {
+                    setCanvasDimensions();
+                    particlesArray = [];
+                    const particleCount = calculateNumberOfParticles();
+                    for (let i = 0; i < particleCount; i++) {
+                        let size = Math.random() * 2 + 0.5;
+                        let x = Math.random() * canvasElement.width;
+                        let y = Math.random() * canvasElement.height;
+                        let speedX = (Math.random() * 0.6) - 0.3;
+                        let speedY = (Math.random() * 0.6) - 0.3;
+                        if (speedX === 0) speedX = 0.1 * (Math.random() < 0.5 ? -1 : 1);
+                        if (speedY === 0) speedY = 0.1 * (Math.random() < 0.5 ? -1 : 1);
+                        particlesArray.push(new Particle(x, y, size, 'rgba(255,255,255,0.6)', speedX, speedY, canvasElement));
+                    }
                 }
 
-                update() {
-                    this.dy += this.gravity;
-                    this.y += this.dy;
-                    this.x += this.dx;
+                function connectParticles() {
+                    const currentCtx = canvasElement.getContext('2d');
+                    let opacityValue = 1;
+                    for (let a = 0; a < particlesArray.length; a++) {
+                        for (let b = a + 1; b < particlesArray.length; b++) {
+                            let dx = particlesArray[a].x - particlesArray[b].x;
+                            let dy = particlesArray[a].y - particlesArray[b].y;
+                            let distance = Math.sqrt(dx * dx + dy * dy);
+                            let connectDistance = 90;
 
-                    if (this.y + (characterFontSize / 2) > canvas.height) {
-                        this.y = canvas.height - (characterFontSize / 2);
-                        this.dy *= -this.elasticity;
-                        this.dx *= 0.9;
-                        if (!this.bounced) {
-                            this.bounced = true;
+                            if (distance < connectDistance) {
+                                opacityValue = 1 - (distance / connectDistance);
+                                currentCtx.strokeStyle = 'rgba(255,255,255,' + opacityValue * 0.5 + ')';
+                                currentCtx.lineWidth = 0.8;
+                                currentCtx.beginPath();
+                                currentCtx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                                currentCtx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                                currentCtx.stroke();
+                            }
                         }
-                        if (Math.abs(this.dy) < 0.5 && this.elasticity < 0.6) this.dy = 0;
-                    }
-                    if (this.x + (characterFontSize / 2) > canvas.width || this.x - (characterFontSize / 2) < 0) {
-                        this.dx *= -1;
-                        if (this.x + (characterFontSize / 2) > canvas.width) this.x = canvas.width - (characterFontSize / 2) - 1;
-                        if (this.x - (characterFontSize / 2) < 0) this.x = (characterFontSize / 2) + 1;
-                    }
-
-                    if (this.bounced) {
-                        this.opacity -= this.fadeSpeed;
-                        if (this.opacity < 0) this.opacity = 0;
                     }
                 }
+
+                function animateParticles() {
+                    const currentCtx = canvasElement.getContext('2d');
+                    currentCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                    for (let i = 0; i < particlesArray.length; i++) {
+                        particlesArray[i].update();
+                    }
+                    connectParticles();
+                    requestAnimationFrame(animateParticles);
+                }
+
+                initParticles();
+                animateParticles();
+
+                let resizeTimer;
+                window.addEventListener('resize', function () {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(function () {
+                        initParticles();
+                    }, 250);
+                });
             }
 
-            function createCharacterParticles() {
-                for (let i = 0; i < numParticlesToCreatePerFrame; i++) {
-                    if (Math.random() < 0.35) {
-                        particles.push(new CharacterParticle());
-                    }
-                }
-            }
+            const heroCanvas = document.getElementById('hero-rain-canvas');
+            const heroSection = document.getElementById('hero');
+            if (heroCanvas && heroSection) createParticleSystem(heroCanvas, heroSection);
 
-            function animateRainingCharacters() {
-                if (!canvas || !ctx || !heroSection) {
-                    return;
-                }
-                if (heroSection.offsetWidth === 0) {
-                    animationFrameId_particles = requestAnimationFrame(animateRainingCharacters);
-                    return;
-                }
-                if (canvas.width !== heroSection.offsetWidth || canvas.height !== heroSection.offsetHeight) {
-                    resizeCanvasParticles();
-                }
+            const skillsCanvas = document.getElementById('skills-particle-canvas');
+            const skillsSection = document.getElementById('skills');
+            if (skillsCanvas && skillsSection) createParticleSystem(skillsCanvas, skillsSection);
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                createCharacterParticles();
-
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    particles[i].update();
-                    particles[i].draw();
-                    if (particles[i].opacity <= 0.01 || particles[i].y > canvas.height + characterFontSize * 3) {
-                        particles.splice(i, 1);
-                    }
-                }
-                animationFrameId_particles = requestAnimationFrame(animateRainingCharacters);
-            }
-
-            resizeCanvasParticles();
-            animateRainingCharacters();
+            const educationCanvas = document.getElementById('education-particle-canvas');
+            const educationSection = document.getElementById('education');
+            if (educationCanvas && educationSection) createParticleSystem(educationCanvas, educationSection);
         });
 
-        // Deterrents for right-click and common keyboard shortcuts for dev tools/view source
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', function (event) {
-            // Ctrl+Shift+I
             if (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'i')) {
                 event.preventDefault();
             }
-            // Ctrl+Shift+J
             if (event.ctrlKey && event.shiftKey && (event.key === 'J' || event.key === 'j')) {
                 event.preventDefault();
             }
-            // Ctrl+U
             if (event.ctrlKey && (event.key === 'U' || event.key === 'u')) {
                 event.preventDefault();
             }
-            // F12
             if (event.key === 'F12') {
                 event.preventDefault();
             }
