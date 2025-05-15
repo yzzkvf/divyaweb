@@ -88,6 +88,12 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
+        #about .card,
+        #experience .card {
+            background: #ffffff;
+        }
+
+
         .card-dark {
             background-color: #2d2d2d;
             color: #e0e0e0;
@@ -107,15 +113,18 @@
         }
 
         .brick-red {
-            color: #9b2d30;
+            /* Changed to black */
+            color: #000000;
         }
 
         .brick-red-bg {
-            background-color: #9b2d30;
+            /* Changed to black */
+            background-color: #000000;
         }
 
         .brick-red-border {
-            border-color: #9b2d30;
+            /* Changed to black */
+            border-color: #000000;
         }
 
         .social-icon {
@@ -135,7 +144,8 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: #9b2d30;
+            background: #000000;
+            /* Changed from brick-red */
         }
 
         .timeline-item {
@@ -151,9 +161,11 @@
             top: 10px;
             width: 16px;
             height: 16px;
-            background: #9b2d30;
+            background: #000000;
+            /* Changed from brick-red */
             border-radius: 50%;
-            box-shadow: 0 0 8px rgba(155, 45, 48, 0.5);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+            /* Adjusted shadow for black */
         }
 
         #education.bg-black .timeline::before,
@@ -185,132 +197,11 @@
             background: none;
         }
 
-        .nav-menu {
-            background: transparent;
-            transition: background-color 0.4s ease;
-        }
-
-        .nav-menu.scrolled {
-            background: rgba(242, 223, 206, 0.95);
-            backdrop-filter: blur(12px);
-        }
-
-        .nav-link {
-            color: #000000;
-            transition: color 0.3s ease, transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: #9b2d30;
-            transform: translateY(-3px);
-        }
-
-        .nav-menu.scrolled #profile-link {
-            color: #9b2d30;
-        }
-
-        .nav-menu.scrolled #profile-link:hover {
-            color: #000000;
-        }
-
-        .resume-button {
-            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
-        }
-
         .resume-button:hover {
-            background-color: #9b2d30;
+            /* Ensure hover uses black */
+            background-color: #000000;
             color: #ffffff !important;
             transform: translateY(-3px);
-        }
-
-        .nav-menu.scrolled .resume-button {
-            color: #000000;
-            border-color: #9b2d30;
-        }
-
-        .nav-menu.scrolled .resume-button i {
-            color: #000000;
-        }
-
-        .menu-icon {
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-
-        .nav-menu:not(.scrolled) .menu-icon {
-            color: #ffffff;
-        }
-
-        .nav-menu:not(.scrolled) .menu-icon:hover {
-            color: #dddddd;
-        }
-
-        .nav-menu.scrolled .menu-icon {
-            color: #9b2d30;
-        }
-
-        .nav-menu.scrolled .menu-icon:hover {
-            color: #000000;
-        }
-
-        .mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.4s ease, background-color 0.3s ease;
-        }
-
-        .mobile-menu.open {
-            transform: translateX(0);
-        }
-
-        #mobile-menu.theme-dark-bg-underneath {
-            background-color: rgba(30, 30, 30, 0.65);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .profile-img-menu {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            transition: border-color 0.3s ease;
-        }
-
-        #mobile-menu .nav-link-profile {
-            font-weight: bold;
-        }
-
-        #mobile-menu .nav-link-profile {
-            color: #9b2d30;
-        }
-
-        #mobile-menu .profile-img-menu {
-            border: 2px solid #9b2d30;
-        }
-
-        #mobile-menu .resume-button-mobile {
-            color: #9b2d30;
-            border-color: #9b2d30;
-        }
-
-        #mobile-menu .resume-button-mobile i {
-            color: #9b2d30;
-        }
-
-        #mobile-menu.theme-dark-bg-underneath .nav-link-profile {
-            color: #FFFFFF;
-        }
-
-        #mobile-menu.theme-dark-bg-underneath .profile-img-menu {
-            border-color: #FFFFFF;
-        }
-
-        #mobile-menu.theme-dark-bg-underneath .resume-button-mobile {
-            color: #FFFFFF;
-            border-color: #FFFFFF;
-        }
-
-        #mobile-menu.theme-dark-bg-underneath .resume-button-mobile i {
-            color: #FFFFFF;
         }
 
         #typing-animation-container {
@@ -367,43 +258,11 @@
 </head>
 
 <body>
-    <header class="fixed top-0 left-0 w-full nav-menu z-50">
-        <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <a href="#hero" class="nav-link flex items-center font-bold text-lg hidden" id="profile-link"
-                    data-menu-item>
-                    <img src="./res/profile.jpg" alt="Divya Paul" class="profile-img-menu mr-2"> Divya Paul
-                </a>
-            </div>
-            <div class="hidden md:flex items-center space-x-4">
-                <a href="./res/resume.pdf" download
-                    class="resume-button px-4 py-2 bg-transparent border-2 border-white text-white rounded-full hover-scale text-sm font-semibold flex items-center">
-                    <i class="fas fa-download mr-1"></i> Resume
-                </a>
-            </div>
-            <div class="md:hidden flex items-center">
-                <button id="mobile-menu-toggle" class="text-2xl menu-icon">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </nav>
-        <div class="mobile-menu fixed top-0 right-0 h-full w-64 bg-[#f2dfce] shadow-lg md:hidden" id="mobile-menu">
-            <div class="flex justify-end p-4">
-                <button id="mobile-menu-close" class="text-2xl menu-icon">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="flex flex-col space-y-4 p-6">
-                <a href="#hero" class="nav-link-profile flex items-center text-lg">
-                    <img src="./res/profile.jpg" alt="Divya Paul" class="profile-img-menu mr-2"> Divya Paul
-                </a>
-                <a href="./res/resume.pdf" download
-                    class="resume-button-mobile px-4 py-2 bg-transparent border-2 rounded-full hover-scale text-sm font-semibold flex items-center">
-                    <i class="fas fa-download mr-1"></i> Resume
-                </a>
-            </div>
-        </div>
-    </header>
+    <a href="./res/resume.pdf" download
+        class="fixed top-6 right-6 bg-black text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover-scale z-50">
+        <i class="fas fa-download text-xl"></i>
+        <span class="sr-only">Download Resume</span>
+    </a>
 
     <section class="min-h-screen flex items-center justify-center hero-bg text-white relative pt-20 bg-black" id="hero">
         <canvas id="hero-rain-canvas"></canvas>
@@ -435,7 +294,7 @@
         </div>
     </section>
 
-    <section class="py-20 px-6" id="about">
+    <section class="py-20 px-6" id="about" style="background-color: #f8f8f8;">
         <div class="max-w-7xl mx-auto section">
             <h2 class="text-4xl font-bold mb-12 text-center brick-red">About Me</h2>
             <div class="card p-8">
@@ -486,7 +345,7 @@
         </div>
     </section>
 
-    <section class="py-20 px-6" id="experience">
+    <section class="py-20 px-6" id="experience" style="background-color: #f8f8f8;">
         <div class="max-w-7xl mx-auto section">
             <h2 class="text-4xl font-bold mb-12 text-center brick-red">Work Experience</h2>
             <div class="relative timeline">
@@ -587,7 +446,7 @@
         </div>
     </section>
 
-    <section class="py-20 px-6 bg-[#f2dfce]" id="contact">
+    <section class="py-20 px-6" id="contact" style="background-color: #f8f8f8;">
         <div class="max-w-7xl mx-auto text-center section">
             <h2 class="text-4xl font-bold mb-12 brick-red">Get in Touch</h2>
             <p class="text-lg mb-8">Interested in collaborating or discussing a project? Reach out!</p>
@@ -704,123 +563,6 @@
                     toggleActions: "play none none reset",
                 },
                 delay: i * 0.2,
-            });
-        });
-
-        const navMenu = document.querySelector('.nav-menu');
-        const profileLink = document.getElementById('profile-link');
-
-        ScrollTrigger.create({
-            trigger: "#hero",
-            start: "top top",
-            end: "max",
-            onUpdate: self => {
-                const heroTop = self.trigger.getBoundingClientRect().top;
-                if (heroTop < -10) {
-                    if (!navMenu.classList.contains('scrolled')) {
-                        navMenu.classList.add('scrolled');
-                    }
-                } else {
-                    if (navMenu.classList.contains('scrolled')) {
-                        navMenu.classList.remove('scrolled');
-                    }
-                }
-            }
-        });
-
-        ScrollTrigger.create({
-            trigger: "#hero",
-            start: "top top-=-1",
-            end: "bottom top",
-            onToggle: self => {
-                if (self.isActive) {
-                    gsap.to(profileLink, { opacity: 0, x: -30, duration: 0.3, ease: "power2.inOut", onComplete: () => profileLink.classList.add('hidden') });
-                } else {
-                    gsap.to(profileLink, { opacity: 1, x: 0, duration: 0.3, ease: "power2.inOut", onStart: () => profileLink.classList.remove('hidden') });
-                }
-            }
-        });
-
-        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-        const mobileMenuClose = document.getElementById('mobile-menu-close');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const contentSectionsForTheme = Array.from(document.querySelectorAll('section[id]'));
-
-        function applyMobileMenuTheme() {
-            if (!mobileMenu.classList.contains('open')) {
-                mobileMenu.classList.remove('theme-dark-bg-underneath');
-                return;
-            }
-
-            let useWhiteTheme = false;
-            if (!navMenu.classList.contains('scrolled')) {
-                useWhiteTheme = true;
-            } else {
-                let prominentSection = null;
-                const navMenuHeight = navMenu.offsetHeight || 70;
-
-                for (const section of contentSectionsForTheme) {
-                    if (section.id === 'hero') continue;
-                    const rect = section.getBoundingClientRect();
-                    if (rect.top <= navMenuHeight && rect.bottom >= navMenuHeight) {
-                        prominentSection = section;
-                        break;
-                    }
-                }
-                if (!prominentSection) {
-                    for (const section of contentSectionsForTheme) {
-                        if (section.id === 'hero') continue;
-                        const rect = section.getBoundingClientRect();
-                        if (rect.top >= 0 && rect.top < window.innerHeight * 0.6) {
-                            prominentSection = section;
-                            break;
-                        }
-                    }
-                }
-
-                if (prominentSection && prominentSection.classList.contains('bg-black')) {
-                    useWhiteTheme = true;
-                }
-            }
-
-            if (useWhiteTheme) {
-                mobileMenu.classList.add('theme-dark-bg-underneath');
-            } else {
-                mobileMenu.classList.remove('theme-dark-bg-underneath');
-            }
-        }
-
-        const mobileMenuThemeObserver = new MutationObserver(() => {
-            if (mobileMenu.classList.contains('open')) {
-                applyMobileMenuTheme();
-            }
-        });
-
-        mobileMenuToggle.addEventListener('click', () => {
-            if (!mobileMenu.classList.contains('open')) {
-                mobileMenu.classList.add('open');
-                applyMobileMenuTheme();
-                mobileMenuThemeObserver.observe(navMenu, { attributes: true, attributeFilter: ['class'] });
-
-                gsap.fromTo(
-                    mobileMenu.querySelectorAll('.nav-link-profile, .resume-button-mobile'),
-                    { opacity: 0, x: 20 },
-                    { opacity: 1, x: 0, stagger: 0.1, duration: 0.5, ease: "power3.out" }
-                );
-            }
-        });
-
-        mobileMenuClose.addEventListener('click', () => {
-            gsap.to(mobileMenu.querySelectorAll('.nav-link-profile, .resume-button-mobile'), {
-                opacity: 0,
-                x: 20,
-                duration: 0.3,
-                ease: "power3.in",
-                onComplete: () => {
-                    mobileMenu.classList.remove('open');
-                    mobileMenu.classList.remove('theme-dark-bg-underneath');
-                    mobileMenuThemeObserver.disconnect();
-                },
             });
         });
 
@@ -980,16 +722,15 @@
                     this.fadeSpeed = 0.005 + Math.random() * 0.01;
                     this.bounced = false;
                     this.color = `rgba(${pastelColors[Math.floor(Math.random() * pastelColors.length)].rgb}, ${this.opacity})`;
-                    this.rotation = 0; // (Math.random() - 0.5) * 0.02; // Optional slight rotation speed
+                    this.rotation = 0;
                 }
 
                 draw() {
                     ctx.save();
                     ctx.translate(this.x, this.y);
-                    // ctx.rotate(this.rotation * Math.PI / 180); // If adding rotation
                     ctx.globalAlpha = this.opacity;
                     ctx.fillStyle = this.color.substring(0, this.color.lastIndexOf(',')) + `, ${this.opacity})`;
-                    ctx.font = `${characterFontSize}px 'Wendy One', cursive`; // Ensure font is set
+                    ctx.font = `${characterFontSize}px 'Wendy One', cursive`;
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
                     ctx.fillText(this.character, 0, 0);
@@ -1001,16 +742,15 @@
                     this.dy += this.gravity;
                     this.y += this.dy;
                     this.x += this.dx;
-                    // this.rotation += this.dx * 0.5; // Optional: make rotation linked to horizontal movement
 
                     if (this.y + (characterFontSize / 2) > canvas.height) {
                         this.y = canvas.height - (characterFontSize / 2);
                         this.dy *= -this.elasticity;
                         this.dx *= 0.9;
-                        if (!this.bounced) { // Start fading only after first bounce
+                        if (!this.bounced) {
                             this.bounced = true;
                         }
-                        if (Math.abs(this.dy) < 0.5 && this.elasticity < 0.6) this.dy = 0; // Come to rest if not very bouncy
+                        if (Math.abs(this.dy) < 0.5 && this.elasticity < 0.6) this.dy = 0;
                     }
                     if (this.x + (characterFontSize / 2) > canvas.width || this.x - (characterFontSize / 2) < 0) {
                         this.dx *= -1;
@@ -1027,7 +767,7 @@
 
             function createCharacterParticles() {
                 for (let i = 0; i < numParticlesToCreatePerFrame; i++) {
-                    if (Math.random() < 0.35) { // Control density 
+                    if (Math.random() < 0.35) {
                         particles.push(new CharacterParticle());
                     }
                 }
@@ -1052,7 +792,7 @@
                 for (let i = particles.length - 1; i >= 0; i--) {
                     particles[i].update();
                     particles[i].draw();
-                    if (particles[i].opacity <= 0.01 || particles[i].y > canvas.height + characterFontSize * 3) { // Remove if faded or far off screen
+                    if (particles[i].opacity <= 0.01 || particles[i].y > canvas.height + characterFontSize * 3) {
                         particles.splice(i, 1);
                     }
                 }
